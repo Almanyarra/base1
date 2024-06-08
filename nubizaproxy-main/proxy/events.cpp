@@ -52,7 +52,6 @@ bool automessage = false;
 bool autopull = false;
 bool pullauto = false; 
 bool setmsg = false;
-bool blink = false;
 std::string message = "";
 std::string mode = "pull";
 bool events::out::generictext(std::string packet) {
@@ -199,29 +198,7 @@ bool events::out::generictext(std::string packet) {
             else
                 gt::send_log("`#Wrench mode is off.");
             return true;
-         }
-		        else if (find_command(chat, "blink")) {
-            blink = !blink;
-            if (blink) {
-                gt::send_log("`2Enabled `9Blink Mode");
-            }
-            else gt::send_log("`4Disabled `9Blink Mode");
 
-            std::thread([&]() {
-                const int c_color[8] = { 1685231359, 1348237567, 2190853119, 2022356223, 2864971775, 2527912447, 3370516479, 3033464831 };
-                while (blink) {
-                    for (auto index = 0; index < 8; index++) {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                        string bsend = toString(c_color[index]);
-                        g_server->send(false, "action|setSkin\ncolor|" + bsend);
-                        std::this_thread::sleep_for(std::chrono::milliseconds(900));
-                    }
-                }
-                }).detach();
-
-                return true;
-
-				
 		}
         
         else if (find_command(chat, "uid ")) {
@@ -589,7 +566,7 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
         case fnv32("OnSendToServer"): g_server->redirect_server(varlist); return true;
 
         case fnv32("OnConsoleMessage"): {
-            varlist[1] = "`4[SF PROXY]`` " + varlist[1].get_string();
+            varlist[1] = " `b[`9SF Proxy`b]```$ " + varlist[1].get_string();
             auto cnsl = varlist[1].get_string();
           g_server->send(true, varlist);
        return true;
