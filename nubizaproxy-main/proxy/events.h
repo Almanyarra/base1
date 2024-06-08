@@ -22,15 +22,3 @@ namespace events {
         bool tracking(std::string packet);
     }; // namespace in
 };     // namespace events
-
-bool wrench = false;
-bool fastdrop = false;
-bool fasttrash = false;
-bool wrenchmsg = false; 
-bool wrenchspam = false; 
-bool automessage = false; 
-bool autopull = false;
-bool pullauto = false; 
-bool setmsg = false;
-std::string message = "";
-std::string mode = "pull";
