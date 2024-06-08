@@ -48,7 +48,14 @@ bool fastdrop = false;
 bool fasttrash = false;
 bool wrenchmsg = false; 
 bool wrenchspam = false; 
-bool automessage = false; 
+bool automessage = false;
+// visual tittles etc
+bool legend = false;
+bool drtitle = false;
+bool maxlevel = false;
+bool g4gtitle = false;
+bool mentornick = false;
+// asd
 bool blink = false;
 bool autopull = false;
 bool pullauto = false; 
@@ -338,6 +345,54 @@ bool events::out::generictext(std::string packet) {
                     mentor[1] = mn.c_str();
                     g_server->send(true, mentor, g_server->m_world.local.netid, -1);
                     return true;
+					        }
+        else if (find_command(chat, "maxlevel")) {
+            std::string packet125level = "us|showGuild|maxLevel";
+
+            variantlist_t packet123{ "OnCountryState" };
+            packet123[1] = packet125level.c_str();
+            g_server->send(true, packet123, g_server->m_world.local.netid, -1);
+            return true;
+        }
+        else if (find_command(chat, "g4g")) {
+            std::string packet125level = "us|showGuild|donor";
+
+            variantlist_t packet123{ "OnCountryState" };
+            packet123[1] = packet125level.c_str();
+            g_server->send(true, packet123, g_server->m_world.local.netid, -1);
+            return true;
+}
+	            if (find_command(chat, "legend")) {
+            auto& visuals = g_server->m_world.local;
+            variantlist_t va{ "OnNameChanged" };
+            va[1] = "``" + visuals.name + " of Legend``";
+            g_server->send(true, va, world.local.netid, -1);
+            //gt::send_log("name set to: " + tittle + " of Legend");
+            return true;
+        }
+        else if (find_command(chat, "doctor")) {
+            auto& visuals = g_server->m_world.local;
+            variantlist_t va{ "OnNameChanged" };
+            va[1] = "`4Dr." + visuals.name;
+            g_server->send(true, va, world.local.netid, -1);
+
+            std::string packetdoctor = "mm|showGuild|doctor";
+            variantlist_t doctor{ "OnCountryState" };
+            doctor[1] = packetdoctor.c_str();
+            g_server->send(true, doctor, g_server->m_world.local.netid, -1);
+            return true;
+        }
+        else if (find_command(chat, "moderator")) {
+            auto& visuals = g_server->m_world.local;
+            variantlist_t va{ "OnNameChanged" };
+            va[1] = "`#@" + visuals.name;
+            g_server->send(true, va, world.local.netid, -1);
+
+            std::string packetmod = "|showGuild|";
+            variantlist_t mod{ "OnCountryState" };
+            mod[1] = packetmod.c_str();
+            g_server->send(true, mod, g_server->m_world.local.netid, -1);
+            return true;
 
         
         } else if (find_command(chat, "proxy")) {
