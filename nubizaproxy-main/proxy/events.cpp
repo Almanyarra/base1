@@ -49,7 +49,7 @@ bool fasttrash = false;
 bool wrenchmsg = false; 
 bool wrenchspam = false; 
 bool automessage = false; 
-bool mentornick = false;
+bool blink = false;
 bool autopull = false;
 bool pullauto = false; 
 bool setmsg = false;
@@ -338,7 +338,6 @@ bool events::out::generictext(std::string packet) {
                     mentor[1] = mn.c_str();
                     g_server->send(true, mentor, g_server->m_world.local.netid, -1);
                     return true;
-}
 
         
         } else if (find_command(chat, "proxy")) {
@@ -358,7 +357,6 @@ bool events::out::generictext(std::string packet) {
                 "\nadd_textbox|`9 `8Welcome To SF Android Proxy 1.0 left|2480|"
                 "\nadd_spacer|small|"
                 "\nadd_label_with_icon|small|`wSF Proxy 1.0 Commands|left|828|"
-                "\nadd_smalltext|`9Command :`0/keep `w(keep proxy features)|left|2480|"
                 "\nadd_spacer|small"
                 "\nadd_smalltext|`b >> `0: `#Proxy Founder: `0sevmemseni|left|"
                 "\nadd_smalltext|`b >> `0: `#Proxy Co-Founder: `0osimaisback `#and `0estoxd |left|"
