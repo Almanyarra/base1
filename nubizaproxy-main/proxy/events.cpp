@@ -56,6 +56,7 @@ bool maxlevel = false;
 bool g4gtitle = false;
 bool mentornick = false;
 // asd
+bool antigravity = true;
 bool blink = false;
 bool autopull = false;
 bool pullauto = false; 
@@ -387,129 +388,9 @@ bool events::out::generictext(std::string packet) {
             packet123[1] = packet125level.c_str();
             g_server->send(true, packet123, g_server->m_world.local.netid, -1);
             return true;
-        }
-		        else if (find_command(chat, "options"))
-        {
-            Dialog casino;
-            casino.addLabelWithIcon("`9Options Page", 32, LABEL_BIG);
-            casino.addSpacer(SPACER_SMALL);
-            casino.addCheckbox("autosurg", "`^Enable `5Auto Surg", auto_surg);
-            casino.addCheckbox("fastdrbp", "`^Enable `5Auto Acces", autoacc);
-            casino.addCheckbox("autobglss", "`^Enable `5Fast Change BGL", autobgl);
-            casino.addCheckbox("pathfindds", "`^Enable `5Pathfinding Toggle", pathfinder);
-            casino.addCheckbox("denemectrl", "`^Enable `5Ctrl TP", denemectrl);
+                }
 
-            casino.addCheckbox("fastdrop", "`^Enable `5Fast Drop", fastdrop);
-            casino.addCheckbox("fasttrash", "`^Enable `5Fast Trash", fasttrash);
-            // casino.addCheckbox("fastghost", "`^Enable `5Ghost Mode", gt::ghost);
-            casino.addCheckbox("ghostanti", "`^Enable `5Anti Ghost", gt::antighost);
-            casino.addCheckbox("fastgravity", "`^Enable `5AntiGravity", antigravity);
-            casino.addCheckbox("enablemod", "`^Enable `5Auto Mod Detect", modas);
-            casino.addButton("kadaryt", "`5Mod Detect Settings");
-            casino.addCheckbox("pocketlighterban", "`^Enable `5Pocket Lighter Ban", PocketLighterBan);
-
-            // casino.addCheckbox("showrealfake", "`^Enable `5Show Real/Fake Spin", realfake);
-             /*
-             casino.addCheckbox("autobanfire", "`^Enable `5Eldritch Flame Fire", autobanfire);
-             casino.addCustomMargin2();
-             casino.addCustomText("`7Will Automatically Ban Someone Put Eldritch Flame.");
-             casino.addCustomMargin1();*/
-            casino.addCheckbox("showgems", "`^Enable `5Show Gems Amount", gem_collect_message);
-            casino.addCheckbox("namenumber", "`^Enable `5Show Last Roulette Spin", namenumber);
-            casino.addCheckbox("latency", "`^Enable `5Display Ping Latency", pinglatency);
-            //casino.addCheckbox("meg4reemer", "`^Enable `5Roulette Reme Mode", spyreme);
-           // casino.addCheckbox("qqrltmeg4", "`^Enable `5Roulette QQ Mode", spyqq);
-            casino.addQuickExit();
-            casino.endDialog("optionspagez", "OK", "Cancel");
-            variantlist_t liste{ "OnDialogRequest" };
-            liste[1] = casino.finishDialog();
-            g_server->send(true, liste);
-            return true;
-		    }
-
-    if (packet.find("optionspagez") != -1)
-    {
-        if (packet.find("autosurg") != -1) {
-            std::string aaa = packet.substr(packet.find("urg|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            auto_surg = stoi(number);
-        }
-        if (packet.find("fastdrop") != -1) {
-            std::string aaa = packet.substr(packet.find("rop|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            fastdrop = stoi(number);
-        }
-        if (packet.find("namenumber") != -1) {
-            std::string aaa = packet.substr(packet.find("ber|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            namenumber = stoi(number);
-        }
-        if (packet.find("latency") != -1) {
-            std::string aaa = packet.substr(packet.find("ncy|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            pinglatency = stoi(number);
-        }
-        if (packet.find("fasttrash") != -1) {
-            std::string aaa = packet.substr(packet.find("ash|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            fasttrash = stoi(number);
-        }
-        if (packet.find("pathfindds") != -1) {
-            std::string aaa = packet.substr(packet.find("dds|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            pathfinder = stoi(number);
-        }
-        if (packet.find("denemectrl") != -1) {
-            std::string aaa = packet.substr(packet.find("trl|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            denemectrl = stoi(number);
-        }
-        if (packet.find("fasttrkp") != -1) {
-            std::string aaa = packet.substr(packet.find("rkp|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            ssup = stoi(number);
-            g_server->sendState(world.local.netid, false);
-        }
-        if (packet.find("fastdrbp") != -1) {
-            std::string aaa = packet.substr(packet.find("rbp|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            autoacc = stoi(number);
-        }
-        if (packet.find("showgems") != -1) {
-            std::string aaa = packet.substr(packet.find("ems|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            gem_collect_message = stoi(number);
-        }
-        if (packet.find("autobanfire") != -1) {
-            std::string aaa = packet.substr(packet.find("ire|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            autobanfire = stoi(number);
-        }
-        if (packet.find("pocketlighterban") != -1) {
-            std::string aaa = packet.substr(packet.find("ban|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            PocketLighterBan = stoi(number);
-        }
-        if (packet.find("showrealfake") != -1) {
-            std::string aaa = packet.substr(packet.find("ake|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            realfake = stoi(number);
-        }
-        if (packet.find("fastghost") != -1) {
-            std::string aaa = packet.substr(packet.find("ost|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            gt::ghost = stoi(number);
-        }
-        if (packet.find("ghostanti") != -1) {
-            std::string aaa = packet.substr(packet.find("nti|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            gt::antighost = stoi(number);
-        }
-        if (packet.find("fastgravity") != -1) {
-            std::string aaa = packet.substr(packet.find("ity|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            antigravity = stoi(number);
-
+        else if (find_command(chat, "antigravity")) {
             GameUpdatePacket packet{ 0 };
             packet.type = PACKET_TILE_CHANGE_REQUEST;
             packet.item_id = 4992;
@@ -533,33 +414,9 @@ bool events::out::generictext(std::string packet) {
             legitpacket.flags = 2592;
             g_server->send(true, NET_MESSAGE_GAME_PACKET, (uint8_t*)&legitpacket, sizeof(GameUpdatePacket));
             antigravity = true;
+            return true;
 
-        }
-        if (packet.find("autobglss") != -1) {
-            std::string aaa = packet.substr(packet.find("lss|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            autobgl = stoi(number);
-        }
-        if (packet.find("qqrltmeg4") != -1) {
-            std::string meggggg = packet.substr(packet.find("eg4|") + 4, packet.size());
-            std::string num = meggggg.c_str();
-            spyqq = stoi(num);
-        }
-        if (packet.find("meg4reemer") != -1) {
-            std::string meggggg = packet.substr(packet.find("mer|") + 4, packet.size());
-            std::string num = meggggg.c_str();
-            spyreme = stoi(num);
-        }
-
-        if (packet.find("enablemod") != -1) {
-            std::string aaa = packet.substr(packet.find("mod|") + 4, packet.size());
-            std::string number = aaa.c_str();
-            while (!number.empty() && isspace(number[number.size() - 1]))
-                number.erase(number.end() - (76 - 0x4B));
-            modas = stoi(number);
 }
- 
-        }
         else if (find_command(chat, "g4g")) {
             std::string packet125level = "us|showGuild|donor";
 
