@@ -400,10 +400,8 @@ bool events::out::generictext(std::string packet) {
             g_server->send(true, liste);
 
             return true;
-}
 	}
     if (packet.find("buttonClicked|legendtitle") != -1)
-    {
         auto& visuals = g_server->m_world.local;
         variantlist_t va{ "OnNameChanged" };
         va[1] = "``" + visuals.name + " of Legend``";
@@ -412,7 +410,6 @@ bool events::out::generictext(std::string packet) {
         return true;
     }
     if (packet.find("buttonClicked|mentortitle") != -1)
-    {
         std::string mn = "|showGuild|master";
 
         variantlist_t mentor{ "OnCountryState" };
@@ -422,7 +419,6 @@ bool events::out::generictext(std::string packet) {
         return true;
     }
     if (packet.find("buttonClicked|g4gtitle") != -1)
-    {
         std::string g4gpacket = "us|showGuild|donor";
 
         variantlist_t packet123{ "OnCountryState" };
@@ -432,7 +428,6 @@ bool events::out::generictext(std::string packet) {
         return true;
     }
     if (packet.find("buttonClicked|doctortitle") != -1)
-    {
         auto& visuals = g_server->m_world.local;
         variantlist_t va{ "OnNameChanged" };
         va[1] = "`4Dr." + visuals.name;
@@ -446,7 +441,6 @@ bool events::out::generictext(std::string packet) {
         return true;
     }
     if (packet.find("buttonClicked|hiddentitle") != -1)
-    {
         auto& visuals = g_server->m_world.local;
 
         variantlist_t va{ "OnNameChanged" };
@@ -457,7 +451,6 @@ bool events::out::generictext(std::string packet) {
         return true;
     }
     if (packet.find("buttonClicked|moderatortitle") != -1)
-    {
         auto& visuals = g_server->m_world.local;
         variantlist_t va{ "OnNameChanged" };
         va[1] = "`#@" + visuals.name;
@@ -471,7 +464,6 @@ bool events::out::generictext(std::string packet) {
         return true;
     }
     if (packet.find("buttonClicked|maxleveltitle") != -1)
-    {
         std::string packet125level = "us|showGuild|maxLevel";
 
         variantlist_t packet123{ "OnCountryState" };
