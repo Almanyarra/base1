@@ -347,7 +347,7 @@ bool events::out::generictext(std::string packet) {
                     g_server->send(true, mentor, g_server->m_world.local.netid, -1);
                     return true;
 					        }
-        else if (find_command(chat, "country")) {
+        else if (find_command(chat, "clist")) {
             std::string paket;
             paket =
                 "\nadd_label_with_icon|big|`0Country Flag List|left|3394|"
@@ -390,32 +390,16 @@ bool events::out::generictext(std::string packet) {
             return true;
                 }
 
-        else if (find_command(chat, "antigravity")) {
-            GameUpdatePacket packet{ 0 };
-            packet.type = PACKET_TILE_CHANGE_REQUEST;
-            packet.item_id = 4992;
-            packet.int_x = 99;
-            packet.int_y = 59;
-            g_server->send(true, NET_MESSAGE_GAME_PACKET, (uint8_t*)&packet, sizeof(GameUpdatePacket));
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        else if (find_command(chat, "cd ")) {
+            std::string cdropcount = chat.substr(8);
+            dropwl = true;
+            g_server->send(false, "action|drop\n|itemID|242");
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|242|\ncount|" + cdropcount); //242
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            gt::send_log("`9Dropping `2" + cdropcount + "`9 Wl...");
 
-            auto pos = g_server->m_world.local.pos;
-
-            g_server->enterDoor(true, 99, 59);
-
-
-            GameUpdatePacket legitpacket{ 0 };
-            legitpacket.type = PACKET_STATE;
-            legitpacket.item_id = 18;
-            legitpacket.int_x = 99;
-            legitpacket.int_y = 59;
-            legitpacket.vec_x = pos.m_x;
-            legitpacket.vec_y = pos.m_y;
-            legitpacket.flags = 2592;
-            g_server->send(true, NET_MESSAGE_GAME_PACKET, (uint8_t*)&legitpacket, sizeof(GameUpdatePacket));
-            antigravity = true;
             return true;
-
 }
         else if (find_command(chat, "g4g")) {
             std::string packet125level = "us|showGuild|donor";
