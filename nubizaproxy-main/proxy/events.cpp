@@ -877,14 +877,7 @@ enum {
     AUTH_RELOG = 6,
 };
 
-bool events::in::tracking(std::string packet) {
-    std::cout << dye::aqua("\n  [");
-    std::cout << dye::white("CLIENT");
-    std::cout << dye::aqua("] ");
-    cout << ("Tracking packet: ");
-    cout << packet.c_str();
-    rtvar var = rtvar::parse(packet);
-    std::string event = var.get("eventName");
+;
 
     if (packet.find("Authentication_error|10") != -1)
     {
@@ -926,20 +919,6 @@ bool events::in::tracking(std::string packet) {
         {
             gt::send_log("`9Player Authentication `4Failed.");
         }
-
-    }
-    if (packet.find("eventName|100_MOBILE.START") != -1)
-    {
-        gems = packet.substr(packet.find("Gems_balance|") + 13, packet.length() - packet.find("Gems_balance|") - 1);
-        level = packet.substr(packet.find("Level|") + 6, packet.length() - packet.find("Level|") - 1);
-        uid = packet.substr(packet.find("GrowId|") + 7, packet.length() - packet.find("GrowId|") - 1);
-        //gt::send_log("`6Gems Balance: `#" + gems);
-        //gt::send_log("`6Account Level: `#" + level);
-        //gt::send_log("`8Your Current UID: `#" + uid);
-    }
-    if (packet.find("eventName|300_WORLD_VISIT") != -1)
-    {
-        gt::send_log("`bLast Joined World `0: `9" + old_world);
 
         if (packet.find("Locked|0") != -1)
         {
