@@ -843,9 +843,22 @@ bool events::in::gamemessage(std::string packet) {
     return false;
 }
 
-bool events::in::sendmapdata(gameupdatepacket_t* packet, int packetLength) {
-    g_server->m_world.LoadFromMem(packet);
+bool events::in::sendmapdata(gameupdatepacket_t* packet) {
+    g_server->m_world = {};
+    auto extended = utils::get_extended(packet);
+    extended += 4;
+    auto data = extended + 6;
+    auto name_length = *(short*)data;
+
+    char* name = new char[name_length + 1];
+    memcpy(name, data + sizeof(short), name_length);
+    char none = '\0';
+    memcpy(name + name_length, &none, 1);
+
+    g_server->m_world.name = std::string(name);
     g_server->m_world.connected = true;
+    delete[] name;
+    PRINTC("world name is %s\n", g_server->m_world.name.c_str());
     return false;
 }
 
@@ -856,86 +869,17 @@ bool events::in::state(gameupdatepacket_t* packet) {
         return false;
 
     auto& players = g_server->m_world.players;
-
     for (auto& player : players) {
         if (player.netid == packet->m_player_flags) {
             player.pos = vector2_t{ packet->m_vec_x, packet->m_vec_y };
+            PRINTC("player %s position is %.0f %.0f\n", player.name.c_str(), player.pos.m_x, player.pos.m_y);
             break;
         }
     }
-
     return false;
 }
 
-enum {
-    AUTH_SUCCESS = 0,
-    AUTH_BANNED = 1,
-    AUTH_SUSPENDED = 2,
-    AUTH_OLDDATE = 3,
-    AUTH_MAX_ATTEMPTS = 4,
-    AUTH_INVALID_ACC = 5,
-    AUTH_RELOG = 6,
-};
-
-;
-
-    if (packet.find("Authentication_error|10") != -1)
-    {
-        gt::send_log("`4OOPS: `9Failed To Login `0/ `2Reconnecting...");
-        g_server->reconnect();
-
-    }
-
-    if (packet.find("Authentication_error|2") != -1)
-    {
-        gt::send_log("`9Proxy Cant Direct You To Growtopia SERVER `0/ `4Because You Banned From Server...");
-    }
-
-    if (packet.find("Authentication_error|17") != -1)
-    {
-        gt::send_log("`4OOPS: `9Failed To Login `0/ `2Reconnecting...");
-        g_server->reconnect();
-
-    }
-
-    if (packet.find("eventName|102_PLAYER.AUTHENTICATION") != -1)
-    {
-        string wlbalance = packet.substr(packet.find("Worldlock_balance|") + 18, packet.length() - packet.find("Worldlock_balance|") - 1);
-
-        if (wlbalance.find("PLAYER.") != -1)
-        {
-            gt::send_log("`9World Lock Balance: `20");
-        }
-        else
-        {
-            gt::send_log("`9World Lock Balance: `2" + wlbalance);
-        }
-
-        if (packet.find("Authenticated|1") != -1)
-        {
-            gt::send_log("`9Player Authentication `2Successfuly.");
-        }
-        else
-        {
-            gt::send_log("`9Player Authentication `4Failed.");
-        }
-
-        if (packet.find("Locked|0") != -1)
-        {
-            gt::send_log("`4This World Is Not Locked By A World Lock.");
-        }
-        else
-        {
-            gt::send_log("`2This World Is Locked By A World Lock.");
-
-            if (packet.find("World_owner|") != -1)
-            {
-
-                string uidd = packet.substr(packet.find("World_owner|") + 12, packet.length() - packet.find("World_owner|") - 1);
-                //gt::send_log("`8World Owner UID: `#" + uidd);
-            }
-        }
-    }
-
+bool events::in::tracking(std::string packet) {
+    PRINTC("Tracking packet: %s\n", packet.c_str());
     return true;
 }
