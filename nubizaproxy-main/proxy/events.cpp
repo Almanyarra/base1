@@ -56,6 +56,7 @@ bool maxlevel = false;
 bool g4gtitle = false;
 bool mentornick = false;
 // asd
+bool dropwl = false;
 bool antigravity = true;
 bool blink = false;
 bool autopull = false;
