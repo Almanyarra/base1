@@ -391,17 +391,6 @@ bool events::out::generictext(std::string packet) {
             return true;
                 }
 
-        else if (find_command(chat, "cd ")) {
-            std::string cdropcount = chat.substr(8);
-            dropwl = true;
-            g_server->send(false, "action|drop\n|itemID|242");
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|242|\ncount|" + cdropcount); //242
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            gt::send_log("`9Dropping `2" + cdropcount + "`9 Wl...");
-
-            return true;
-}
         else if (find_command(chat, "g4g")) {
             std::string packet125level = "us|showGuild|donor";
 
