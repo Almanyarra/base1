@@ -480,57 +480,9 @@ bool events::out::generictext(std::string packet) {
         gt::send_log("`9Tittle Configrued To `0: `cMaxLevel `0Tittle");
         return true;
 }
-        else if (find_command(chat, "maxlevel")) {
-            std::string packet125level = "us|showGuild|maxLevel";
-
-            variantlist_t packet123{ "OnCountryState" };
-            packet123[1] = packet125level.c_str();
-            g_server->send(true, packet123, g_server->m_world.local.netid, -1);
-            return true;
-                }
-
-        else if (find_command(chat, "g4g")) {
-            std::string packet125level = "us|showGuild|donor";
-
-            variantlist_t packet123{ "OnCountryState" };
-            packet123[1] = packet125level.c_str();
-            g_server->send(true, packet123, g_server->m_world.local.netid, -1);
-            return true;
-}
-	            if (find_command(chat, "legend")) {
-            auto& visuals = g_server->m_world.local;
-            variantlist_t va{ "OnNameChanged" };
-            va[1] = "``" + visuals.name + " of Legend``";
-            g_server->send(true, va, world.local.netid, -1);
-            //gt::send_log("name set to: " + tittle + " of Legend");
-            return true;
-        }
-        else if (find_command(chat, "doctor")) {
-            auto& visuals = g_server->m_world.local;
-            variantlist_t va{ "OnNameChanged" };
-            va[1] = "`4Dr." + visuals.name;
-            g_server->send(true, va, world.local.netid, -1);
-
-            std::string packetdoctor = "mm|showGuild|doctor";
-            variantlist_t doctor{ "OnCountryState" };
-            doctor[1] = packetdoctor.c_str();
-            g_server->send(true, doctor, g_server->m_world.local.netid, -1);
-            return true;
-        }
-        else if (find_command(chat, "moderator")) {
-            auto& visuals = g_server->m_world.local;
-            variantlist_t va{ "OnNameChanged" };
-            va[1] = "`#@" + visuals.name;
-            g_server->send(true, va, world.local.netid, -1);
-
-            std::string packetmod = "|showGuild|";
-            variantlist_t mod{ "OnCountryState" };
-            mod[1] = packetmod.c_str();
-            g_server->send(true, mod, g_server->m_world.local.netid, -1);
-            return true;
-
         
-        } else if (find_command(chat, "proxy")) {
+        
+         else if (find_command(chat, "proxy")) {
            // gt::send_log(
             //    "`2/tp [name] (teleports to a player in the world), /ghost (toggles ghost, you wont move for others when its enabled), /uid "
             //    "`2[name] (resolves name to uid), /flag [id] (sets flag to item id), /name [name] (sets name to name), /banall, /kickall, /tradeall"
