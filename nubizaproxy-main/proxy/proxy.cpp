@@ -11,9 +11,9 @@ server* g_server = new server();
 
 int main() {
 #ifdef _WIN32
-    SetConsoleTitleA("proxy by ama");
+    SetConsoleTitleA("proxy by sevmemseni");
 #endif
-    printf("enet proxy by ama\n");
+    printf("enet proxy by sevmemseni\n");
 
 
     enet_initialize();
