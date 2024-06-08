@@ -65,7 +65,7 @@ bool pullauto = false;
 bool setmsg = false;
 std::string message = "";
 std::string mode = "pull";
-bool events::out::generictext(std::string packet) {
+bool events::out::generictext(std::string packet) 
     PRINTS("Generic text: %s\n", packet.c_str());
     auto& world = g_server->m_world;
     rtvar var = rtvar::parse(packet);
@@ -94,7 +94,7 @@ bool events::out::generictext(std::string packet) {
                 return true;
             }
         }
-    if (var.get(0).m_key == "action" && var.get(0).m_value == "input") {
+    if (var.get(0).m_key == "action" && var.get(0).m_value == "input") 
         if (var.size() < 2)
             return false;
         if (var.get(1).m_values.size() < 2)
@@ -383,7 +383,7 @@ bool events::out::generictext(std::string packet) {
             g_server->send(true, liste);
             return true;
 {
-	        else if (find_command(chat, "tittle")) {
+	        else if (find_command(chat, "tittle")) 
             Dialog a;
             a.addLabelWithIcon("`9Tittle Page", 5624, LABEL_BIG);
             a.addSmallText(" ");
@@ -639,7 +639,7 @@ bool events::out::generictext(std::string packet) {
     return false;
 }
 
-bool events::out::gamemessage(std::string packet) {
+bool events::out::gamemessage(std::string packet) 
     PRINTS("Game message: %s\n", packet.c_str());
     if (packet == "action|quit") {
         g_server->quit();
@@ -649,7 +649,7 @@ bool events::out::gamemessage(std::string packet) {
     return false;
 }
 
-bool events::out::state(gameupdatepacket_t* packet) {
+bool events::out::state(gameupdatepacket_t* packet) 
     if (!g_server->m_world.connected)
         return false;
 
@@ -661,7 +661,7 @@ bool events::out::state(gameupdatepacket_t* packet) {
     return false;
 }
 
-bool events::in::variantlist(gameupdatepacket_t* packet) {
+bool events::in::variantlist(gameupdatepacket_t* packet) 
     variantlist_t varlist{};
     auto extended = utils::get_extended(packet);
     extended += 4; //since it casts to data size not data but too lazy to fix this
@@ -870,12 +870,12 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
     return false;
 }
 
-bool events::in::generictext(std::string packet) {
+bool events::in::generictext(std::string packet) 
     PRINTC("Generic text: %s\n", packet.c_str());
     return false;
 }
 
-bool events::in::gamemessage(std::string packet) {
+bool events::in::gamemessage(std::string packet) 
     PRINTC("Game message: %s\n", packet.c_str());
 
     if (gt::resolving_uid2) {
@@ -893,7 +893,7 @@ bool events::in::gamemessage(std::string packet) {
     return false;
 }
 
-bool events::in::sendmapdata(gameupdatepacket_t* packet) {
+bool events::in::sendmapdata(gameupdatepacket_t* packet) 
     g_server->m_world = {};
     auto extended = utils::get_extended(packet);
     extended += 4;
@@ -912,7 +912,7 @@ bool events::in::sendmapdata(gameupdatepacket_t* packet) {
     return false;
 }
 
-bool events::in::state(gameupdatepacket_t* packet) {
+bool events::in::state(gameupdatepacket_t* packet) 
     if (!g_server->m_world.connected)
         return false;
     if (packet->m_player_flags == -1)
@@ -929,7 +929,6 @@ bool events::in::state(gameupdatepacket_t* packet) {
     return false;
 }
 
-bool events::in::tracking(std::string packet) {
+bool events::in::tracking(std::string packet) 
     PRINTC("Tracking packet: %s\n", packet.c_str());
     return true;
-}
