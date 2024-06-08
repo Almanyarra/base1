@@ -346,12 +346,84 @@ bool events::out::generictext(std::string packet) {
                     g_server->send(true, mentor, g_server->m_world.local.netid, -1);
                     return true;
 					        }
+        else if (find_command(chat, "country")) {
+            std::string paket;
+            paket =
+                "\nadd_label_with_icon|big|`0Country Flag List|left|3394|"
+                "\nadd_spacer|small"
+                "\nadd_textbox|`clt `0: `#Lithuania|left|2480|"
+                "\nadd_textbox|`ctr `0: `#Turkey|left|2480|"
+                "\nadd_textbox|`caz `0: `#Azerbaycan|left|2480|"
+                "\nadd_textbox|`cen `0: `#USA|left|2480|"
+                "\nadd_textbox|`ckr `0: `#Korean|left|2480|"
+                "\nadd_textbox|`cid `0: `#Indonesia|left|2480|"
+                "\nadd_textbox|`caf `0: `#Afghanistan|left|2480|"
+                "\nadd_textbox|`cal `0: `#Albania|left|2480|"
+                "\nadd_textbox|`cdz `0: `#Algeria|left|2480|"
+                "\nadd_textbox|`cas `0: `#American Samoa|left|2480|"
+                "\nadd_textbox|`cad `0: `#Andorra|left|2480|"
+                "\nadd_textbox|`cao `0: `#Angola|left|2480|"
+                "\nadd_textbox|`cai `0: `#Anguilla|left|2480|"
+                "\nadd_textbox|`caq `0: `#Antarctica|left|2480|"
+                "\nadd_textbox|`cag `0: `#Antigua and Barbuda|left|2480|"
+                "\nadd_textbox|`car `0: `#Argentina|left|2480|"
+                "\nadd_textbox|`cam `0: `#Armenia|left|2480|"
+                "\nadd_textbox|`cth `0: `#Thailand|left|2480|"
+                "\nadd_textbox|`ces `0: `#Spain|left|2480|"
+                "\nadd_textbox|`cso `0: `#Somalia|left|2480|"
+                "\nadd_textbox|`cse `0: `#Sweden|left|2480|"
+                "\nadd_textbox|`cmm `0: `#Myanmar|left|2480|"
+                "\nadd_quick_exit|"
+                "\nend_dialog|end|Cancel|Okay|";
+            variantlist_t liste{ "OnDialogRequest" };
+            liste[1] = paket;
+            g_server->send(true, liste);
+            return true;
+					        }
         else if (find_command(chat, "maxlevel")) {
             std::string packet125level = "us|showGuild|maxLevel";
 
             variantlist_t packet123{ "OnCountryState" };
             packet123[1] = packet125level.c_str();
             g_server->send(true, packet123, g_server->m_world.local.netid, -1);
+            return true;
+        }
+		        else if (find_command(chat, "options"))
+        {
+            Dialog casino;
+            casino.addLabelWithIcon("`9Options Page", 32, LABEL_BIG);
+            casino.addSpacer(SPACER_SMALL);
+            casino.addCheckbox("autosurg", "`^Enable `5Auto Surg", auto_surg);
+            casino.addCheckbox("fastdrbp", "`^Enable `5Auto Acces", autoacc);
+            casino.addCheckbox("autobglss", "`^Enable `5Fast Change BGL", autobgl);
+            casino.addCheckbox("pathfindds", "`^Enable `5Pathfinding Toggle", pathfinder);
+            casino.addCheckbox("denemectrl", "`^Enable `5Ctrl TP", denemectrl);
+
+            casino.addCheckbox("fastdrop", "`^Enable `5Fast Drop", fastdrop);
+            casino.addCheckbox("fasttrash", "`^Enable `5Fast Trash", fasttrash);
+            // casino.addCheckbox("fastghost", "`^Enable `5Ghost Mode", gt::ghost);
+            casino.addCheckbox("ghostanti", "`^Enable `5Anti Ghost", gt::antighost);
+            casino.addCheckbox("fastgravity", "`^Enable `5AntiGravity", antigravity);
+            casino.addCheckbox("enablemod", "`^Enable `5Auto Mod Detect", modas);
+            casino.addButton("kadaryt", "`5Mod Detect Settings");
+            casino.addCheckbox("pocketlighterban", "`^Enable `5Pocket Lighter Ban", PocketLighterBan);
+
+            // casino.addCheckbox("showrealfake", "`^Enable `5Show Real/Fake Spin", realfake);
+             /*
+             casino.addCheckbox("autobanfire", "`^Enable `5Eldritch Flame Fire", autobanfire);
+             casino.addCustomMargin2();
+             casino.addCustomText("`7Will Automatically Ban Someone Put Eldritch Flame.");
+             casino.addCustomMargin1();*/
+            casino.addCheckbox("showgems", "`^Enable `5Show Gems Amount", gem_collect_message);
+            casino.addCheckbox("namenumber", "`^Enable `5Show Last Roulette Spin", namenumber);
+            casino.addCheckbox("latency", "`^Enable `5Display Ping Latency", pinglatency);
+            //casino.addCheckbox("meg4reemer", "`^Enable `5Roulette Reme Mode", spyreme);
+           // casino.addCheckbox("qqrltmeg4", "`^Enable `5Roulette QQ Mode", spyqq);
+            casino.addQuickExit();
+            casino.endDialog("optionspagez", "OK", "Cancel");
+            variantlist_t liste{ "OnDialogRequest" };
+            liste[1] = casino.finishDialog();
+            g_server->send(true, liste);
             return true;
         }
         else if (find_command(chat, "g4g")) {
