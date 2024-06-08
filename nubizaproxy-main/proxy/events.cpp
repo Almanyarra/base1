@@ -381,6 +381,104 @@ bool events::out::generictext(std::string packet) {
             liste[1] = paket;
             g_server->send(true, liste);
             return true;
+{
+	        else if (find_command(chat, "tittle")) {
+            Dialog a;
+            a.addLabelWithIcon("`9Tittle Page", 5624, LABEL_BIG);
+            a.addSmallText(" ");
+            a.addButton("legendtitle", "`9Legend `0Tittle");
+            a.addButton("mentortitle", "`8Mentor `0Tittle");
+            a.addButton("g4gtitle", "`cG4G `0Tittle");
+            a.addButton("doctortitle", "`4Doctor `0Tittle");
+            a.addButton("hiddentitle", "`bHidden `0Tittle");
+            a.addButton("moderatortitle", "`#Moderator `0Tittle");
+            a.addButton("maxleveltitle", "`4MaxLevel `0Tittle");
+            a.addQuickExit();
+            a.endDialog("end", "Cancel", "Okey");
+            variantlist_t liste{ "OnDialogRequest" };
+            liste[1] = a.finishDialog();
+            g_server->send(true, liste);
+
+            return true;
+}
+	}
+    if (packet.find("buttonClicked|legendtitle") != -1)
+    {
+        auto& visuals = g_server->m_world.local;
+        variantlist_t va{ "OnNameChanged" };
+        va[1] = "``" + visuals.name + " of Legend``";
+        g_server->send(true, va, world.local.netid, -1);
+        gt::send_log("`9Tittle Configrued To `0: `9Legend `0Tittle");
+        return true;
+    }
+    if (packet.find("buttonClicked|mentortitle") != -1)
+    {
+        std::string mn = "|showGuild|master";
+
+        variantlist_t mentor{ "OnCountryState" };
+        mentor[1] = mn.c_str();
+        g_server->send(true, mentor, g_server->m_world.local.netid, -1);
+        gt::send_log("`9Tittle Configrued To `0: `8Mentor `0Tittle");
+        return true;
+    }
+    if (packet.find("buttonClicked|g4gtitle") != -1)
+    {
+        std::string g4gpacket = "us|showGuild|donor";
+
+        variantlist_t packet123{ "OnCountryState" };
+        packet123[1] = g4gpacket.c_str();
+        g_server->send(true, packet123, g_server->m_world.local.netid, -1);
+        gt::send_log("`9Tittle Configrued To `0: `cG4G `0Tittle");
+        return true;
+    }
+    if (packet.find("buttonClicked|doctortitle") != -1)
+    {
+        auto& visuals = g_server->m_world.local;
+        variantlist_t va{ "OnNameChanged" };
+        va[1] = "`4Dr." + visuals.name;
+        g_server->send(true, va, world.local.netid, -1);
+
+        std::string packetdoctor = "ae|showGuild|doctor";
+        variantlist_t doctor{ "OnCountryState" };
+        doctor[1] = packetdoctor.c_str();
+        g_server->send(true, doctor, g_server->m_world.local.netid, -1);
+        gt::send_log("`9Tittle Configrued To `0: `4Doctor `0Tittle");
+        return true;
+    }
+    if (packet.find("buttonClicked|hiddentitle") != -1)
+    {
+        auto& visuals = g_server->m_world.local;
+
+        variantlist_t va{ "OnNameChanged" };
+        va[1] = "`b HIDDEN";
+        g_server->send(true, va, world.local.netid, -1);
+
+        gt::send_log("`9Tittle Configrued To `0: `bHIDDEN `0Tittle");
+        return true;
+    }
+    if (packet.find("buttonClicked|moderatortitle") != -1)
+    {
+        auto& visuals = g_server->m_world.local;
+        variantlist_t va{ "OnNameChanged" };
+        va[1] = "`#@" + visuals.name;
+        g_server->send(true, va, world.local.netid, -1);
+
+        std::string packetmod = "|showGuild|";
+        variantlist_t mod{ "OnCountryState" };
+        mod[1] = packetmod.c_str();
+        g_server->send(true, mod, g_server->m_world.local.netid, -1);
+        gt::send_log("`9Tittle Configrued To `0: `#Moderator `0Tittle");
+        return true;
+    }
+    if (packet.find("buttonClicked|maxleveltitle") != -1)
+    {
+        std::string packet125level = "us|showGuild|maxLevel";
+
+        variantlist_t packet123{ "OnCountryState" };
+        packet123[1] = packet125level.c_str();
+        g_server->send(true, packet123, g_server->m_world.local.netid, -1);
+        gt::send_log("`9Tittle Configrued To `0: `cMaxLevel `0Tittle");
+        return true;
 					        }
         else if (find_command(chat, "maxlevel")) {
             std::string packet125level = "us|showGuild|maxLevel";
