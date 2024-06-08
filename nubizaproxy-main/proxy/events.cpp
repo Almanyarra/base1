@@ -425,6 +425,140 @@ bool events::out::generictext(std::string packet) {
             liste[1] = casino.finishDialog();
             g_server->send(true, liste);
             return true;
+		    }
+
+    if (packet.find("optionspagez") != -1)
+    {
+        if (packet.find("autosurg") != -1) {
+            std::string aaa = packet.substr(packet.find("urg|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            auto_surg = stoi(number);
+        }
+        if (packet.find("fastdrop") != -1) {
+            std::string aaa = packet.substr(packet.find("rop|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            fastdrop = stoi(number);
+        }
+        if (packet.find("namenumber") != -1) {
+            std::string aaa = packet.substr(packet.find("ber|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            namenumber = stoi(number);
+        }
+        if (packet.find("latency") != -1) {
+            std::string aaa = packet.substr(packet.find("ncy|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            pinglatency = stoi(number);
+        }
+        if (packet.find("fasttrash") != -1) {
+            std::string aaa = packet.substr(packet.find("ash|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            fasttrash = stoi(number);
+        }
+        if (packet.find("pathfindds") != -1) {
+            std::string aaa = packet.substr(packet.find("dds|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            pathfinder = stoi(number);
+        }
+        if (packet.find("denemectrl") != -1) {
+            std::string aaa = packet.substr(packet.find("trl|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            denemectrl = stoi(number);
+        }
+        if (packet.find("fasttrkp") != -1) {
+            std::string aaa = packet.substr(packet.find("rkp|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            ssup = stoi(number);
+            g_server->sendState(world.local.netid, false);
+        }
+        if (packet.find("fastdrbp") != -1) {
+            std::string aaa = packet.substr(packet.find("rbp|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            autoacc = stoi(number);
+        }
+        if (packet.find("showgems") != -1) {
+            std::string aaa = packet.substr(packet.find("ems|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            gem_collect_message = stoi(number);
+        }
+        if (packet.find("autobanfire") != -1) {
+            std::string aaa = packet.substr(packet.find("ire|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            autobanfire = stoi(number);
+        }
+        if (packet.find("pocketlighterban") != -1) {
+            std::string aaa = packet.substr(packet.find("ban|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            PocketLighterBan = stoi(number);
+        }
+        if (packet.find("showrealfake") != -1) {
+            std::string aaa = packet.substr(packet.find("ake|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            realfake = stoi(number);
+        }
+        if (packet.find("fastghost") != -1) {
+            std::string aaa = packet.substr(packet.find("ost|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            gt::ghost = stoi(number);
+        }
+        if (packet.find("ghostanti") != -1) {
+            std::string aaa = packet.substr(packet.find("nti|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            gt::antighost = stoi(number);
+        }
+        if (packet.find("fastgravity") != -1) {
+            std::string aaa = packet.substr(packet.find("ity|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            antigravity = stoi(number);
+
+            GameUpdatePacket packet{ 0 };
+            packet.type = PACKET_TILE_CHANGE_REQUEST;
+            packet.item_id = 4992;
+            packet.int_x = 99;
+            packet.int_y = 59;
+            g_server->send(true, NET_MESSAGE_GAME_PACKET, (uint8_t*)&packet, sizeof(GameUpdatePacket));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+            auto pos = g_server->m_world.local.pos;
+
+            g_server->enterDoor(true, 99, 59);
+
+
+            GameUpdatePacket legitpacket{ 0 };
+            legitpacket.type = PACKET_STATE;
+            legitpacket.item_id = 18;
+            legitpacket.int_x = 99;
+            legitpacket.int_y = 59;
+            legitpacket.vec_x = pos.m_x;
+            legitpacket.vec_y = pos.m_y;
+            legitpacket.flags = 2592;
+            g_server->send(true, NET_MESSAGE_GAME_PACKET, (uint8_t*)&legitpacket, sizeof(GameUpdatePacket));
+            antigravity = true;
+
+        }
+        if (packet.find("autobglss") != -1) {
+            std::string aaa = packet.substr(packet.find("lss|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            autobgl = stoi(number);
+        }
+        if (packet.find("qqrltmeg4") != -1) {
+            std::string meggggg = packet.substr(packet.find("eg4|") + 4, packet.size());
+            std::string num = meggggg.c_str();
+            spyqq = stoi(num);
+        }
+        if (packet.find("meg4reemer") != -1) {
+            std::string meggggg = packet.substr(packet.find("mer|") + 4, packet.size());
+            std::string num = meggggg.c_str();
+            spyreme = stoi(num);
+        }
+
+        if (packet.find("enablemod") != -1) {
+            std::string aaa = packet.substr(packet.find("mod|") + 4, packet.size());
+            std::string number = aaa.c_str();
+            while (!number.empty() && isspace(number[number.size() - 1]))
+                number.erase(number.end() - (76 - 0x4B));
+            modas = stoi(number);
+}
+ 
         }
         else if (find_command(chat, "g4g")) {
             std::string packet125level = "us|showGuild|donor";
