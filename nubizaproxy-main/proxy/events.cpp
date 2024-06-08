@@ -49,6 +49,7 @@ bool fasttrash = false;
 bool wrenchmsg = false; 
 bool wrenchspam = false; 
 bool automessage = false; 
+bool mentornick = false;
 bool autopull = false;
 bool pullauto = false; 
 bool setmsg = false;
@@ -329,30 +330,16 @@ bool events::out::generictext(std::string packet) {
             }
             return true;
 
+   }
+		                else if (find_command(chat, "mentor")) {
+                    std::string mn = "|showGuild|master";
+                    gt::send_log("`9Succesfuly Changed Mentor Title")
+                        ; variantlist_t mentor{ "OnCountryState" };
+                    mentor[1] = mn.c_str();
+                    g_server->send(true, mentor, g_server->m_world.local.netid, -1);
+                    return true;
+}
 
-}else if (find_command(chat, "pinfo")) {
-                   std::string paket;
-            paket =
-                "\nadd_label_with_icon|big|Proxy information|left|20|"
-               "\nadd_image_button|banner|interface/large/special_event.rttex|bannerlayout|||"
-                "\nadd_spacer|small"
-                "\nadd_textbox|`9This Proxy Made by Ama6nen and Re-Edit By FakeModz#1192|left|2480|"
-                "\nadd_textbox|`9Command List for command list please do /phelp|left|2480|"
-                "\nadd_textbox|`9Thanks to :|left|2480|"
-                "\nadd_textbox|`9Gucktube YT|left|2480|"
-                "\nadd_textbox|`9Ama6nen|left|2480|"
-                "\nadd_textbox|`9Genta 7740|left|2480|"
-                "\nadd_textbox|`9BotHax YT|left|2480|"
-                "\nadd_textbox|`9SrMotion|left|2480|"
-                "\nadd_textbox|`9If you Want Re-Edit this proxy please|left|2480|"
-                "\nadd_textbox|`9Dont Edit/Delete The Credits!!!|left|2480|"
-                "\nadd_textbox|`9or you will dieee !!!!!|left|2480|"
-                "\nadd_quick_exit|"
-                "\nend_dialog|end|Cancel|Okay|";
-            variantlist_t liste{ "OnDialogRequest" };
-            liste[1] = paket;
-            g_server->send(true, liste);
-            return true;
         
         } else if (find_command(chat, "proxy")) {
            // gt::send_log(
@@ -368,13 +355,13 @@ bool events::out::generictext(std::string packet) {
                 "\ndisable_resize|"
                 "\nreset_placement_x|"
                 "\nend_custom_tabs|"
-                "\nadd_textbox|`9 `8Welcome To SF Proxy 1.0 left|2480|"
+                "\nadd_textbox|`9 `8Welcome To SF Android Proxy 1.0 left|2480|"
                 "\nadd_spacer|small|"
                 "\nadd_label_with_icon|small|`wSF Proxy 1.0 Commands|left|828|"
                 "\nadd_smalltext|`9Command :`0/keep `w(keep proxy features)|left|2480|"
                 "\nadd_spacer|small"
-                "\nadd_smalltext|`b >> `0: `#Proxy Founder: `0estoxd|left|"
-                "\nadd_smalltext|`b >> `0: `#Proxy Co-Founder: `0osimaisback `#and `0sevmemseni |left|"
+                "\nadd_smalltext|`b >> `0: `#Proxy Founder: `0sevmemseni|left|"
+                "\nadd_smalltext|`b >> `0: `#Proxy Co-Founder: `0osimaisback `#and `0estoxd |left|"
                 "\nadd_spacer|small"
                 "\nadd_spacer|small"
                 "\nadd_label_with_icon|big|`2Main Commands|left|1900|"
@@ -413,14 +400,6 @@ bool events::out::generictext(std::string packet) {
                 "\nadd_smalltext|`9Command :`0/setsave [world name] `w(Set Save World)|left|2480|"
                 "\nadd_smalltext|`9Command :`0/save `w(Warp Save World)|left|2480|"
                 "\nadd_smalltext|`9Command :`0/acces `w(enable/disable auto acc)|left|2480|"
-                "\nadd_spacer|small"
-                "\nadd_label_with_icon|small|`2Trick Commands|left|758|"
-                "\nadd_smalltext|`9Command :`0/trick `w(toggle trick page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/npos `w(set lamp1 pos(no-tax))|left|2480|"
-                "\nadd_smalltext|`9Command :`0/lamp1 `w(set lamp1 pos)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/lamp2 `w(set lamp2 pos)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/type `w(toggle type page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/sendtype `w(send type)|left|2480|"
                 "\nadd_spacer|small"
                 "\nadd_label_with_icon|small|`2Visual Commands|left|8996|"
                 "\nadd_smalltext|`9Command :`0/find [item name] `w(Find Item Name For Visual Clothes)|left|2480|"
@@ -462,7 +441,7 @@ bool events::out::generictext(std::string packet) {
                 "\nadd_smalltext|`9Command :`0/ptp [playername] `w(tp player)|left|2480|"
                 "\nadd_smalltext|`9Command :`0/gems `w(See Gems in the World)|left|2480|"
                 "\nadd_spacer|small"
-                "\nadd_smalltext|`4SF Proxy in Beta For This You Can Get `bShadowban `9or `bBan `9For This Dont Use Your Main Account|left|828|"
+                "\nadd_smalltext|`4SF Android Proxy in Beta For This You Can Get `bShadowban `9or `bBan `9For This Dont Use Your Main Account|left|828|"
                 "\nadd_quick_exit|"
                 "\nend_dialog|end|Cancel|Okay|";
             //OnStoreRequest
