@@ -43,6 +43,10 @@ bool find_command(std::string chat, std::string name) {
         gt::send_log("`6" + chat);
     return found;
 }
+int wl_count = 0;
+int dl_count = 0;
+int bgl_count = 0;
+bool wldropfast = false;
 bool cdrop = false;
 bool dropbgl = false;
 bool dropdl = false;
@@ -56,6 +60,9 @@ bool automessage = false;
 bool autopull = false;
 bool pullauto = false; 
 bool setmsg = false;
+std::string wlbalance = "";
+std::string wldrop = "";
+std::string wldrop2 = "";
 std::string message = "";
 std::string mode = "pull";
 bool events::out::generictext(std::string packet) {
