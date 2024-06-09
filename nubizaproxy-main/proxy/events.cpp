@@ -43,6 +43,10 @@ bool find_command(std::string chat, std::string name) {
         gt::send_log("`6" + chat);
     return found;
 }
+bool cdrop = false;
+bool dropbgl = false;
+bool dropdl = false;
+bool dropwl = false;
 bool wrench = false;
 bool fastdrop = false;
 bool fasttrash = false;
@@ -352,6 +356,111 @@ bool events::out::generictext(std::string packet) {
             liste[1] = paket;
             g_server->send(true, liste);
             return true;
+		}
+        else if (find_command(chat, "cdrop ")) {
+            try {
+                std::string cdropcount = chat.substr(7);
+                int sayi = stoi(cdropcount);
+
+                if (balance() < sayi) {
+                    gt::send_log("`9Dont have `#balance`9. balance: " + to_string(balance()) + ".");
+                    return true;
+                }
+                if (sayi < 100) {
+
+                    if (item_count(242) < sayi) {
+                        gameupdatepacket_t drop{ 0 };
+                        drop.m_type = PACKET_ITEM_ACTIVATE_REQUEST;
+                        drop.m_int_data = 1796;
+                        g_server->send(false, NET_MESSAGE_GAME_PACKET, (uint8_t*)&drop, sizeof(gameupdatepacket_t));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+
+                    dropwl = true;
+                    g_server->send(false, "action|drop\n|itemID|242");
+                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                    g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|242|\ncount|" + cdropcount); //242
+                    gt::send_log("`9Dropping `c" + cdropcount + "`9 wls...");
+                }
+
+                else if (sayi > 10000) {
+
+
+                    int sayi1 = (sayi / 10000);
+
+                    int kalan = ((sayi / 100) - (sayi1 * 100));
+                    int kalan2 = sayi - ((kalan * 100) + (sayi1 * 10000));
+                    if (kalan > item_count(1796)) {
+                        gameupdatepacket_t drop{ 0 };
+                        drop.m_type = PACKET_ITEM_ACTIVATE_REQUEST;
+                        drop.m_int_data = 7188;
+                        g_server->send(false, NET_MESSAGE_GAME_PACKET, (uint8_t*)&drop, sizeof(gameupdatepacket_t));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                    else if (item_count(242) < kalan2) {
+                        gameupdatepacket_t drop{ 0 };
+                        drop.m_type = PACKET_ITEM_ACTIVATE_REQUEST;
+                        drop.m_int_data = 1796;
+                        g_server->send(false, NET_MESSAGE_GAME_PACKET, (uint8_t*)&drop, sizeof(gameupdatepacket_t));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                    dropbgl = true;
+                    g_server->send(false, "action|drop\n|itemID|7188");
+                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+                    g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|7188|\ncount|" + std::to_string(sayi1)); //242
+
+                    dropdl = true;
+                    g_server->send(false, "action|drop\n|itemID|1796");
+                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+                    g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|1796|\ncount|" + std::to_string(kalan)); //242
+
+                    dropwl = true;
+                    g_server->send(false, "action|drop\n|itemID|242");
+                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+                    g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|242|\ncount|" + std::to_string(kalan2)); //242
+
+                    gt::send_log("`9Dropping `c" + cdropcount + "`9 wls...");
+                }
+                else {
+                    int sayi1 = (sayi / 100);
+                    int kalan = (sayi % 100);
+
+                    if (item_count(242) < kalan) {
+                        gameupdatepacket_t drop{ 0 };
+                        drop.m_type = PACKET_ITEM_ACTIVATE_REQUEST;
+                        drop.m_int_data = 1796;
+                        g_server->send(false, NET_MESSAGE_GAME_PACKET, (uint8_t*)&drop, sizeof(gameupdatepacket_t));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+                    }
+                    else if (item_count(1796) < sayi1) {
+                        gameupdatepacket_t drop{ 0 };
+                        drop.m_type = PACKET_ITEM_ACTIVATE_REQUEST;
+                        drop.m_int_data = 242;
+                        g_server->send(false, NET_MESSAGE_GAME_PACKET, (uint8_t*)&drop, sizeof(gameupdatepacket_t));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+                    }
+                    dropdl = true;
+                    g_server->send(false, "action|drop\n|itemID|1796");
+                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+                    g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|1796|\ncount|" + std::to_string(sayi1)); //242
+
+                    dropwl = true;
+                    g_server->send(false, "action|drop\n|itemID|242");
+                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+                    g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|242|\ncount|" + std::to_string(kalan)); //242
+
+                    gt::send_log("`9Dropping `c" + cdropcount + "`9 wls...");
+                }
+            }
+            catch (std::exception) { gt::send_log("Critical Error : Invalid String Position"); }
+        return true;
         
         } else if (find_command(chat, "phelp")) {
            // gt::send_log(
