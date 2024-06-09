@@ -168,11 +168,7 @@ bool events::out::generictext(std::string packet) {
                 gt::send_log("`#wrenchspam is now disabled.");
             return true;
         }  
-     else if (find_command(chat, "setmsg ")) {
-       message = chat.substr(7);
-       gt::send_log("Set Message to"+ message); 
-       return true;
-         }
+
 
         
         else if (find_command(chat, "wrenchset ")) {
@@ -189,117 +185,16 @@ bool events::out::generictext(std::string packet) {
             return true;
          }
         
-        else if (find_command(chat, "uid ")) {
-            std::string name = chat.substr(5);
-            gt::send_log("resolving uid for " + name);
-            g_server->send(false, "action|input\n|text|/ignore /" + name);
-            g_server->send(false, "action|friends");
-            gt::resolving_uid2 = true;
-            return true;
 
-        } else if (find_command(chat, "tp ")) {
-            std::string name = chat.substr(4);
-            std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                std::transform(name_2.begin(), name_2.end(), name_2.begin(), ::tolower);
-                if (name_2.find(name) == 0) {
-                    gt::send_log("`#Teleporting to " + player.name);
-                    variantlist_t varlist{ "OnSetPos" };
-                    varlist[1] = player.pos;
-                    g_server->m_world.local.pos = player.pos;
-                    g_server->send(true, varlist, g_server->m_world.local.netid, -1);
-                    break;
-                }
-            }
-         
 
          
-        } else if (find_command(chat, "warp ")) {
+            else if (find_command(chat, "warp ")) {
             std::string name = chat.substr(6);
             gt::send_log("`#Warping to " + name);
             g_server->send(false, "action|join_request\nname|" + name, 3);
             return true;
           
-      } else if (find_command(chat, "door ")) {
-            std::string worldname = g_server->m_world.name.c_str();
-            std::string idkntl = chat.substr(6);
-            g_server->send(false, "action|join_request\nname|" + worldname + "|" + idkntl, 3);
-            return true;
-
-           } else if (find_command(chat, "pullall")) {
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                    g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + std::to_string(player.netid) + "|\nbuttonClicked|pull"); 
-                    // You Can |kick |trade |worldban 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    gt::send_log("`4Pulling all people");
-                  
-                }
-            }
-} else if (find_command(chat, "killall")) {
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                    g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + std::to_string(player.netid) + "|\nbuttonClicked|kick"); 
-                    // You Can |kick |trade |worldban 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    gt::send_log("`4Kill All People in world");
-                  
-                }
-            }
-} else if (find_command(chat, "tradeall")) {
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                    g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + std::to_string(player.netid) + "|\nbuttonClicked|trade"); 
-                    // You Can |kick |trade |worldban 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    gt::send_log("`4Trade all people in world");
-                  
-                }
-            }
-} else if (find_command(chat, "banall")) {
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                    g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + std::to_string(player.netid) + "|\nbuttonClicked|worldban"); 
-                    // You Can |kick |trade |worldban 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    gt::send_log("`4Banned all people in world");
-                  
-                }
-            }
-
-} else if (find_command(chat, "msgall")) {
-           std::string msgtext = "              Message from FakeModz YT";
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                  g_server->send(false, "action|input\n|text|/msg "  +        player.name         +                   msgtext);
-                 // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                 // g_server->send(false, "action|input\n|text|/msg "  +        player2.name         +                   msgtext);
-                  //std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                 // gt::send_log("`4Message all people in world");
-                  
-                }
-            }
-       
+	}
             return true;
         } else if (find_command(chat, "skin ")) {
             int skin = atoi(chat.substr(6).c_str());
@@ -316,33 +211,67 @@ bool events::out::generictext(std::string packet) {
                     g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
             }
             return true;
+    }
+	    // visuallerin başlangıcı
+	        else if (find_command(chat, "mentor")) {
+            std::string mn = "|showGuild|master";
 
-
-}else if (find_command(chat, "pinfo")) {
-                   std::string paket;
-            paket =
-                "\nadd_label_with_icon|big|Proxy information|left|20|"
-               "\nadd_image_button|banner|interface/large/special_event.rttex|bannerlayout|||"
-                "\nadd_spacer|small"
-                "\nadd_textbox|`9This Proxy Made by Ama6nen and Re-Edit By FakeModz#1192|left|2480|"
-                "\nadd_textbox|`9Command List for command list please do /phelp|left|2480|"
-                "\nadd_textbox|`9Thanks to :|left|2480|"
-                "\nadd_textbox|`9Gucktube YT|left|2480|"
-                "\nadd_textbox|`9Ama6nen|left|2480|"
-                "\nadd_textbox|`9Genta 7740|left|2480|"
-                "\nadd_textbox|`9BotHax YT|left|2480|"
-                "\nadd_textbox|`9SrMotion|left|2480|"
-                "\nadd_textbox|`9If you Want Re-Edit this proxy please|left|2480|"
-                "\nadd_textbox|`9Dont Edit/Delete The Credits!!!|left|2480|"
-                "\nadd_textbox|`9or you will dieee !!!!!|left|2480|"
-                "\nadd_quick_exit|"
-                "\nend_dialog|end|Cancel|Okay|";
-            variantlist_t liste{ "OnDialogRequest" };
-            liste[1] = paket;
-            g_server->send(true, liste);
+            variantlist_t mentor{ "OnCountryState" };
+            mentor[1] = mn.c_str();
+            g_server->send(true, mentor, g_server->m_world.local.netid, -1);
             return true;
-        
-        } else if (find_command(chat, "phelp")) {
+        }
+        else if (find_command(chat, "maxlevel")) {
+            std::string packet125level = "us|showGuild|maxLevel";
+
+            variantlist_t packet123{ "OnCountryState" };
+            packet123[1] = packet125level.c_str();
+            g_server->send(true, packet123, g_server->m_world.local.netid, -1);
+            return true;
+        }
+        else if (find_command(chat, "g4g")) {
+            std::string packet125level = "us|showGuild|donor";
+
+            variantlist_t packet123{ "OnCountryState" };
+            packet123[1] = packet125level.c_str();
+            g_server->send(true, packet123, g_server->m_world.local.netid, -1);
+            return true;
+	}
+	        if (find_command(chat, "legend")) {
+            auto& visuals = g_server->m_world.local;
+            variantlist_t va{ "OnNameChanged" };
+            va[1] = "``" + visuals.name + " of Legend``";
+            g_server->send(true, va, world.local.netid, -1);
+            //gt::send_log("name set to: " + tittle + " of Legend");
+            return true;
+        }
+        else if (find_command(chat, "doctor")) {
+            auto& visuals = g_server->m_world.local;
+            variantlist_t va{ "OnNameChanged" };
+            va[1] = "`4Dr." + visuals.name;
+            g_server->send(true, va, world.local.netid, -1);
+
+            std::string packetdoctor = "mm|showGuild|doctor";
+            variantlist_t doctor{ "OnCountryState" };
+            doctor[1] = packetdoctor.c_str();
+            g_server->send(true, doctor, g_server->m_world.local.netid, -1);
+            return true;
+        }
+        else if (find_command(chat, "moderator")) {
+            auto& visuals = g_server->m_world.local;
+            variantlist_t va{ "OnNameChanged" };
+            va[1] = "`#@" + visuals.name;
+            g_server->send(true, va, world.local.netid, -1);
+
+            std::string packetmod = "|showGuild|";
+            variantlist_t mod{ "OnCountryState" };
+            mod[1] = packetmod.c_str();
+            g_server->send(true, mod, g_server->m_world.local.netid, -1);
+            return true;
+            //visuals end
+
+
+        } else if (find_command(chat, "proxy")) {
            // gt::send_log(
             //    "`2/tp [name] (teleports to a player in the world), /ghost (toggles ghost, you wont move for others when its enabled), /uid "
             //    "`2[name] (resolves name to uid), /flag [id] (sets flag to item id), /name [name] (sets name to name), /banall, /kickall, /tradeall"
@@ -351,37 +280,97 @@ bool events::out::generictext(std::string packet) {
             //    "`2/wrenchmsg (Auto Msg Wrench People), /setmsg (for set message text)");
            std::string paket1;
             paket1 =
-                "\nadd_label_with_icon|big|Proxy Commands Gazette|left|20|"
-                "\nadd_image_button|banner|interface/large/news_banner.rttex|bannerlayout|||"
+		"\nset_default_color|"
+                "\nstart_custom_tabs|"
+                "\ndisable_resize|"
+                "\nreset_placement_x|"
+                "\nend_custom_tabs|"
+                "\nadd_textbox|`9 `8Welcome To SF Proxy 1.0 left|2480|"
+                "\nadd_spacer|small|"
+                "\nadd_label_with_icon|small|`wSF Proxy 1.0 Commands|left|828|"
                 "\nadd_spacer|small"
-                "\nadd_textbox|`2/tp [name] (teleports to a player in the world)|left|2480|"
-                "\nadd_textbox|`2/ghost (toggles ghost, you wont move for others when its enabled)|left|2480|"
-                "\nadd_textbox|`2/uid [name] (resolves name to uid)|left|2480|"
-                "\nadd_textbox|`2/flag [id] (sets flag to item id)|left|2480|"
-                "\nadd_textbox|`2/name [name] (Change Name Visual)|left|2480|"
-                "\nadd_textbox|`2/banall (World Ban All People in world)|left|2480|"
-                "\nadd_textbox|`2/killall (Kick all People in world)|left|2480|"
-                "\nadd_textbox|`2/tradeall (trade all people in the world|left|2480|"
-                "\nadd_textbox|`2/warp [world name] (warping world without SSUP)|left|2480|"
-                "\nadd_textbox|`2/skin [Id] (change skin colours)|left|2480|"
-                "\nadd_textbox|`2/wrenchmode (wrench modefor wrench pull, kick, pull, ban, trade, add)|left|2480|"
-                "\nadd_textbox|`2/wrenchset (for set wrenchmode : pull,kick,ban,trade,add friend)|left|2480|"
-                "\nadd_textbox|`2/ft (fast trash) |left|2480|"
-                "\nadd_textbox|`2/fd (fast drop) |left|2480|"
-                "\nadd_textbox|`2/wrenchmsg (Auto Msg when wrench people) |left|2480|"
-                "\nadd_textbox|`2/setmsg (Costum Text for Wrenchmsg and wrenchspam) |left|2480|"
-                "\nadd_textbox|`2/country (/countrylist for check list)|left|2480|"
-                "\nadd_textbox|`2/msgall (not really worked because spam detected) |left|2480|"
-                "\nadd_textbox|`2/wrenchspam (wrench spam like wrench msg do/setspam for set text) |left|2480|"
-                "\nadd_textbox|`2/automsg (auto msg when people enter world) |left|2480|"
-                "\nadd_textbox|`2/door (teleport to id door (you must know the id door)) |left|2480|"
-                "\nadd_textbox|`2/pinfo (Proxy information) |left|2480|"
-                "\nadd_textbox|`2/countrylist (List Country For /country) |left|2480|"
-                "\nadd_textbox|`2/autopull (auto pull when people enter world) |left|2480|"
-                "\nadd_textbox|`2/pullauto (auto pull for casino hoster) |left|2480|"
-                "\nadd_spacer|small|\n\nadd_url_button||`$YouTube``|NOFLAGS|https://youtube.com/c/FakeModzGT|Open link?|0|0|"
-                "\nadd_spacer|small|\n\nadd_url_button||`$Discord``|NOFLAGS|https://discord.com/invite/YfnMbjWjpP|Open link?|0|0|"
-                "\nadd_spacer|small|\n\nadd_url_button||`$INSTAGRAM``|NOFLAGS|https://instagram.com/FakeModz.yt|Open link?|0|0|"
+                "\nadd_smalltext|`b >> `0: `#Proxy Founder: `0estoxd|left|"
+                "\nadd_smalltext|`b >> `0: `#Proxy Co-Founder: `0osimaisback `#and `0sevmemseni |left|"
+                "\nadd_spacer|small"
+                "\nadd_spacer|small"
+                "\nadd_label_with_icon|big|`2Main Commands|left|1900|"
+                "\nadd_smalltext|`9Command :`0/options `w(toogles options page)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/logs `w(toogles logs page)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/ac `w(autoCollect)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/collect `w(collect 1 Times)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/wrench `w(toogles wrench page)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/autosurg `w(enables auto surgery)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/bgl `w(auto exchange blue gem lock)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/spam `w(toogle spam page)|left|2480|"
+                "\nadd_smalltext|`9Command :`0// `w(start auto spam)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/pf `w(open/close pathfinder) (use with shift)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/world `w(toogles world page)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/lastspin `w(show last spin)|left|2480|"
+                "\nadd_spacer|small"
+                "\nadd_label_with_icon|small|`2Casino Commands|left|758|"
+                "\nadd_smalltext|`9Command :`0/reme `w(enable/disable reme spin)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/qq `w(enable/disable qq spin)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/game [bet] `w(calculate tax)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/gd `w(drop wls with tax [/game [bet] ])|left|2480|"
+                "\nadd_smalltext|`9Command :`0/tax `w(Set Tax)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/pos1 `w(set pos1 position)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/pos2 `w(set pos2 position)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/tp `w(collect pos1,pos2 wls&dls)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/win1 `w(teleport To 1. pos and drop taxed wls)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/win2 `w(teleport To 2. pos and drop taxed wls)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/mode `w(sellect game mode)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/cd & /cdrop `w(custom drop)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/dd & /ddrop `w(drop dls)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/dropbgl `w(drop bgl)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/dropwl `w(drop wl)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/daw `w(drop all locks)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/gp `w(enable/disable gass pul)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/setsave [world name] `w(Set Save World)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/save `w(Warp Save World)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/acces `w(enable/disable auto acc)|left|2480|"
+                "\nadd_spacer|small"
+                "\nadd_label_with_icon|small|`2Visual Commands|left|8996|"
+                "\nadd_smalltext|`9Command :`0/find [item name] `w(Find Item Name For Visual Clothes)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/clothes `w(toogle clothes page)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/weather `w(toogle weather page)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/title `w(toogle titles page)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/g4g `w(G4G title)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/maxlevel `w(MaxLevel title)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/fakeres `w(fake respawn)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/mentor `w(Mentor Title)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/legend `w(Legend Title)|left|2480|"
+                "\nadd_spacer|small"
+                "\nadd_label_with_icon|small|`2Other Commands|left|32|"
+                "\nadd_smalltext|`9Command :`0/name `w(change you name)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/dmove `w(enable/disable dance move)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/superpunch `w(enable/disable super punch)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/res `w(fast respawn)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/lastpull `w(pull last joined world)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/showxy `w(show your xy)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/speed `w(change speed and gravity)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/fastvend `w(open/close fastvend)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/antigravity `w(normal antigravity)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/vendcount `w(set vend count)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/debug `w(debug mode)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/split [%] `w(Split Your WLs)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/count `w(set count for fast drop & trash)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/growscan & /gscan `w(normal growscan)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/speed `w(set your speed)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/testmod `w(mod detect test)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/back `w(warp previously entered world)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/relog `w(relog world)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/warp [world name] `w(like super supporter)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/balance `w(see your wls&dls&bgls)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/auto `w(toogle autu page menu)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/blink `w(fast skin changer)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/autosurg `w(open/close autosurg)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/clist `w(see country list)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/country [id] `w(change your country)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/ptp [playername] `w(tp player)|left|2480|"
+                "\nadd_smalltext|`9Command :`0/gems `w(See Gems in the World)|left|2480|"
+                "\nadd_spacer|small"
+                "\nadd_smalltext|`4SF Proxy in Beta For This You Can Get `bShadowban `9or `bBan `9For This Dont Use Your Main Account|left|828|"
+                "\nadd_spacer|small|\n\nadd_url_button||`$Discord``|NOFLAGS|https://discord.com/invite/DYfwdqxXHx|Open link?|0|0|"
                 "\nadd_quick_exit|"
                 "\nend_dialog|end|Cancel|Okay|";
             variantlist_t liste{ "OnDialogRequest" };
@@ -483,7 +472,7 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
         case fnv32("OnSendToServer"): g_server->redirect_server(varlist); return true;
 
         case fnv32("OnConsoleMessage"): {
-            varlist[1] = "`4[PROXY]`` " + varlist[1].get_string();
+            varlist[1] = " `b[`9SF Proxy`b]```$ " + varlist[1].get_string();
             auto cnsl = varlist[1].get_string();
           g_server->send(true, varlist);
        return true;
