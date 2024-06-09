@@ -287,6 +287,26 @@ bool events::out::generictext(std::string packet) {
             g_server->send(true, mod, g_server->m_world.local.netid, -1);
             return true;
             //visuals end
+		// burayı unutma hata buradadir olmazsa
+	}
+	        else if (find_command(chat, "tittle")) {
+            Dialog a;
+            a.addLabelWithIcon("`9Tittle Page", 5624, LABEL_BIG);
+            a.addSmallText(" ");
+            a.addButton("legendtitle", "`9Legend `0Tittle");
+            a.addButton("mentortitle", "`8Mentor `0Tittle");
+            a.addButton("g4gtitle", "`cG4G `0Tittle");
+            a.addButton("doctortitle", "`4Doctor `0Tittle");
+            a.addButton("hiddentitle", "`bHidden `0Tittle");
+            a.addButton("moderatortitle", "`#Moderator `0Tittle");
+            a.addButton("maxleveltitle", "`4MaxLevel `0Tittle");
+            a.addQuickExit();
+            a.endDialog("end", "Cancel", "Okey");
+            variantlist_t liste{ "OnDialogRequest" };
+            liste[1] = a.finishDialog();
+            g_server->send(true, liste);
+
+            return true;
 
 
         } else if (find_command(chat, "proxy")) {
