@@ -43,6 +43,24 @@ bool find_command(std::string chat, std::string name) {
         gt::send_log("`6" + chat);
     return found;
 }
+bool wrench = false;
+bool fastdrop = false;
+bool fasttrash = false;
+bool wrenchmsg = false; 
+bool wrenchspam = false; 
+bool automessage = false; 
+bool autopull = false;
+bool pullauto = false; 
+bool setmsg = false;
+std::string message = "";
+std::string mode = "pull";
+// visual tittles bool
+bool legend = false;
+bool drtitle = false;
+bool maxlevel = false;
+bool g4gtitle = false;
+bool mentornick = false;
+// finish
 bool events::out::generictext(std::string packet) {
     PRINTS("Generic text: %s\n", packet.c_str());
     auto& world = g_server->m_world;
