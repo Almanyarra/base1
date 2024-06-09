@@ -247,6 +247,13 @@ int item_count(int itemid) {
             gt::send_log("`#Warping to " + name);
             g_server->send(false, "action|join_request\nname|" + name, 3);
             return true;
+	}
+	            else if (find_command(chat, "balance")) {
+
+        gt::send_log("`2WL : " + to_string(item_count(242)));
+        gt::send_log("`2DL : " + to_string(item_count(1796)));
+        gt::send_log("`2BGL : " + to_string(item_count(7188)));
+        return true;
           
       } else if (find_command(chat, "door ")) {
             std::string worldname = g_server->m_world.name.c_str();
