@@ -87,6 +87,18 @@ bool events::out::generictext(std::string packet) {
                 return true;
             }
         }
+	int balance() {
+    int wl = 0;
+    wl += g_server->local_player.inventory.getItemCount(242);
+    wl += g_server->local_player.inventory.getItemCount(1796) * 100;
+    wl += g_server->local_player.inventory.getItemCount(7188) * 10000;
+    return wl;
+}
+
+int item_count(int itemid) {
+    int wl = g_server->local_player.inventory.getItemCount(itemid);
+    return wl;
+}
     if (var.get(0).m_key == "action" && var.get(0).m_value == "input") {
         if (var.size() < 2)
             return false;
