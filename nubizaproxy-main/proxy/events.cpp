@@ -94,7 +94,7 @@ bool events::out::generictext(std::string packet) {
                 return true;
             }
         }
-	int balance() {
+	int balance() 
     int wl = 0;
     wl += g_server->local_player.inventory.getItemCount(242);
     wl += g_server->local_player.inventory.getItemCount(1796) * 100;
@@ -102,7 +102,7 @@ bool events::out::generictext(std::string packet) {
     return wl;
 }
 
-int item_count(int itemid) {
+int item_count(int itemid) 
     int wl = g_server->local_player.inventory.getItemCount(itemid);
     return wl;
 }
