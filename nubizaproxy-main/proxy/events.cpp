@@ -52,6 +52,7 @@ bool automessage = false;
 bool autopull = false;
 bool pullauto = false; 
 bool setmsg = false;
+std::string locallastspin = "";
 std::string message = "";
 std::string mode = "pull";
 bool events::out::generictext(std::string packet) {
@@ -327,7 +328,53 @@ bool events::out::generictext(std::string packet) {
                     g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
             }
             return true;
+}
+	    
 
+        else if (find_command(chat, "lastspin"))
+        {
+            namenumber = !namenumber;
+            if (namenumber)
+                gt::send_log("`9Show Last Spin Mode `2Enabled.");
+            else
+                gt::send_log("`9Show Last Spin Mode `4Disabled.");
+            return true;
+}
+    }
+	           if (namenumber)
+            {
+                for (auto& player : g_server->m_world.players) {
+                    if (netidspin == player.netid) {
+                        if (wry.find(player.name.substr(2).substr(0, player.name.length() - 4)) != -1) {
+                            std::string numb = wry.substr(wry.find("spun the wheel and got ") + 23, wry.length());
+                            string sw = numb.substr(0, numb.find("!"));
+                            if (player.name == g_server->m_world.local.name)
+                            {
+                                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                                if (pinglatency == false)
+                                {
+                                    variantlist_t va{ "OnNameChanged" };
+                                    va[1] = player.name + " `b[``" + sw + "`b]";
+                                    g_server->send(true, va, player.netid);
+                                }
+                                else {
+                                    locallastspin = " `b[``" + sw + "`b]";
+                                }
+                            }
+                            else
+                            {
+                                if (player.name == g_server->m_world.local.name) {}
+                                else
+                                {
+                                    variantlist_t va{ "OnNameChanged" };
+                                    va[1] = player.name + " `b[``" + sw + "`b]";
+                                    g_server->send(true, va, player.netid);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
 }else if (find_command(chat, "pinfo")) {
                    std::string paket;
