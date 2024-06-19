@@ -288,7 +288,7 @@ bool events::out::generictext(std::string packet) {
                 //"\nadd_text_input |spam_msg|`9Spam text: | " + gt:: + " |30"
                 "\nadd_text_input|spam_msg|`5Spam Text : ||50|"
                 //add_text_input|" + name + "|" + text + "|" + cont + "|" + to_string(size) + "|
-                "\nadd_text_input|delay_msg|`5Delay `2(Interval): |" + toString(delay) + "|4|"
+                "\nadd_text_input|delay_msg|`5Delay `2(Interval): |" + std::to_string(delay) + "|4|"
                 "\nadd_textbox|`51000 `2Ms`5 = `01 Interval|left|2480|"
                 "\nend_dialog|spam_text|Cancel|Set|"; //"\nend_dialog|colored_text|Cancel|Set|";
             variantlist_t send{ "OnDialogRequest" };
@@ -323,8 +323,8 @@ bool events::out::generictext(std::string packet) {
 
         }
         catch (exception a) {
-            std::cout << "error?";
-            std::cout << a.what();
+           // std::cout << "error?";
+           // std::cout << a.what();
         }
         return true;
     }
