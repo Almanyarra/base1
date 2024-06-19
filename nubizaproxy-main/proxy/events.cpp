@@ -138,6 +138,14 @@ bool events::out::generictext(std::string packet) {
             else
                 gt::send_log("`#Fast Trash is now disabled.");
             return true;
+	}
+	            else if (find_command(chat, "relog")) {
+            string relogxd = g_server->m_world.name;
+            g_server->send(false, "action|quit_to_exit", 3);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            g_server->send(false, "action|join_request\nname|" + relogxd + "\ninvitedWorld|0", 3);
+            gt::send_log("`#Reloging To `2Current World.");
+            return true;
         }        
         else if (find_command(chat, "wrenchmsg")) {
             wrenchmsg = !wrenchmsg;
