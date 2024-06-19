@@ -55,8 +55,7 @@ bool setmsg = false;
 // reme qq spin
 bool spyreme = false;
 bool spyqq = false;
-std::string locallastspin = "";
-std::string last_number = "";
+bool realfake = true;
 //asd
 std::string message = "";
 std::string mode = "pull";
@@ -925,40 +924,6 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
 
 
 
-            if (namenumber)
-            {
-                for (auto& player : g_server->m_world.players) {
-                    if (netidspin == player.netid) {
-                        if (wry.find(player.name.substr(2).substr(0, player.name.length() - 4)) != -1) {
-                            std::string numb = wry.substr(wry.find("spun the wheel and got ") + 23, wry.length());
-                            string sw = numb.substr(0, numb.find("!"));
-                            if (player.name == g_server->m_world.local.name)
-                            {
-                                std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                                if (pinglatency == false)
-                                {
-                                    variantlist_t va{ "OnNameChanged" };
-                                    va[1] = player.name + " `b[``" + sw + "`b]";
-                                    g_server->send(true, va, player.netid);
-                                }
-                                else {
-                                    locallastspin = " `b[``" + sw + "`b]";
-                                }
-                            }
-                            else
-                            {
-                                if (player.name == g_server->m_world.local.name) {}
-                                else
-                                {
-                                    variantlist_t va{ "OnNameChanged" };
-                                    va[1] = player.name + " `b[``" + sw + "`b]";
-                                    g_server->send(true, va, player.netid);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             // 1sn sa 
 
             if (packet->m_int_data == 1800)
