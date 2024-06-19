@@ -3,7 +3,7 @@
 #include "server.h"
 #include "utils.h"
 
-std::string gt::version = "4.58";
+std::string gt::version = "4.59";
 std::string gt::flag = "kr";
 bool gt::resolving_uid2 = false;
 bool gt::connecting = false;
