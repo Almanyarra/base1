@@ -52,6 +52,12 @@ bool automessage = false;
 bool autopull = false;
 bool pullauto = false; 
 bool setmsg = false;
+// reme qq spin
+bool spyreme = false;
+bool spyqq = false;
+std::string locallastspin = "";
+std::string last_number = "";
+//asd
 std::string message = "";
 std::string mode = "pull";
 bool events::out::generictext(std::string packet) {
@@ -244,6 +250,37 @@ bool events::out::generictext(std::string packet) {
             std::string worldname = g_server->m_world.name.c_str();
             std::string idkntl = chat.substr(6);
             g_server->send(false, "action|join_request\nname|" + worldname + "|" + idkntl, 3);
+            return true;
+	}
+	            else if (find_command(chat, "lastspin"))
+        {
+            namenumber = !namenumber;
+            if (namenumber)
+                gt::send_log("`9Show Last Spin Mode `2Enabled.");
+            else
+                gt::send_log("`9Show Last Spin Mode `4Disabled.");
+            return true;
+	}
+	            else if (find_command(chat, "reme")) {
+            spyreme = !spyreme;
+            if (spyreme) {
+                gt::send_log("`9Reme Spin Is `2ON");
+            }
+            else {
+                gt::send_log("`9Reme Spin Is `4OFF");
+            }
+            return true;
+        }
+
+
+        else if (find_command(chat, "qq")) {
+            spyqq = !spyqq;
+            if (spyqq) {
+                gt::send_log("`9QQ Spin Is `2ON");
+            }
+            else {
+                gt::send_log("`9QQ Spin Is `4OFF");
+            }
             return true;
 
            } else if (find_command(chat, "pullall")) {
@@ -642,6 +679,303 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
                     return true;
                 }
             }
+        }
+		if (wry.find("the wheel and got") != -1)
+        {
+            std::string spyxde = wry.substr(wry.find("spun the wheel and got ") + 25, wry.length());
+            int toplam = 0;
+            std::string spins = "";
+
+            int the_num = std::atoi(spyxde.substr(0, spyxde.find(" ")).c_str());
+            last_number = the_num;
+
+            if (spyreme) {
+                switch (the_num) {
+                case 0:
+                    toplam = 0;
+                    break;
+                case 1:
+                    toplam = 1;
+                    break;
+                case 2:
+                    toplam = 2;
+                    break;
+                case 3:
+                    toplam = 3;
+                    break;
+                case 4:
+                    toplam = 4;
+                    break;
+                case 5:
+                    toplam = 5;
+                    break;
+                case 6:
+                    toplam = 6;
+                    break;
+                case 7:
+                    toplam = 7;
+                    break;
+                case 8:
+                    toplam = 8;
+                    break;
+                case 9:
+                    toplam = 9;
+                    break;
+                case 10:
+                    toplam = 1;
+                    break;
+                case 11:
+                    toplam = 2;
+                    break;
+                case 12:
+                    toplam = 3;
+                    break;
+                case 13:
+                    toplam = 4;
+                    break;
+                case 14:
+                    toplam = 5;
+                    break;
+                case 15:
+                    toplam = 6;
+                    break;
+                case 16:
+                    toplam = 7;
+                    break;
+                case 17:
+                    toplam = 8;
+                    break;
+                case 18:
+                    toplam = 9;
+                    break;
+                case 19:
+                    toplam = 0;
+                    break;
+                case 20:
+                    toplam = 2;
+                    break;
+                case 21:
+                    toplam = 3;
+                    break;
+                case 22:
+                    toplam = 4;
+                    break;
+                case 23:
+                    toplam = 5;
+                    break;
+                case 24:
+                    toplam = 6;
+                    break;
+                case 25:
+                    toplam = 7;
+                    break;
+                case 26:
+                    toplam = 8;
+                    break;
+                case 27:
+                    toplam = 9;
+                    break;
+                case 28:
+                    toplam = 0;
+                    break;
+                case 29:
+                    toplam = 1;
+                    break;
+                case 30:
+                    toplam = 3;
+                    break;
+                case 31:
+                    toplam = 4;
+                    break;
+                case 32:
+                    toplam = 5;
+                    break;
+                case 33:
+                    toplam = 6;
+                    break;
+                case 34:
+                    toplam = 7;
+                    break;
+                case 35:
+                    toplam = 8;
+                    break;
+                case 36:
+                    toplam = 9;
+                    break;
+                }
+            }
+
+            else if (spyqq) {
+                switch (the_num) {
+                case 0:
+                    toplam = 0;
+
+                    break;
+                case 1:
+                    toplam = 1;
+                    break;
+                case 2:
+                    toplam = 2;
+                    break;
+                case 3:
+                    toplam = 3;
+                    break;
+                case 4:
+                    toplam = 4;
+                    break;
+                case 5:
+                    toplam = 5;
+                    break;
+                case 6:
+                    toplam = 6;
+                    break;
+                case 7:
+                    toplam = 7;
+                    break;
+                case 8:
+                    toplam = 8;
+                    break;
+                case 9:
+                    toplam = 9;
+                    break;
+                case 10:
+                    toplam = 0;
+                    break;
+                case 11:
+                    toplam = 1;
+                    break;
+                case 12:
+                    toplam = 2;
+                    break;
+                case 13:
+                    toplam = 3;
+                    break;
+                case 14:
+                    toplam = 4;
+                    break;
+                case 15:
+                    toplam = 5;
+                    break;
+                case 16:
+                    toplam = 6;
+                    break;
+                case 17:
+                    toplam = 7;
+                    break;
+                case 18:
+                    toplam = 8;
+                    break;
+                case 19:
+                    toplam = 9;
+                    break;
+                case 20:
+                    toplam = 0;
+                    break;
+                case 21:
+                    toplam = 1;
+                    break;
+                case 22:
+                    toplam = 2;
+                    break;
+                case 23:
+                    toplam = 3;
+                    break;
+                case 24:
+                    toplam = 4;
+                    break;
+                case 25:
+                    toplam = 5;
+                    break;
+                case 26:
+                    toplam = 6;
+                    break;
+                case 27:
+                    toplam = 7;
+                    break;
+                case 28:
+                    toplam = 8;
+                    break;
+                case 29:
+                    toplam = 9;
+                    break;
+                case 30:
+                    toplam = 0;
+                    break;
+                case 31:
+                    toplam = 1;
+                    break;
+                case 32:
+                    toplam = 2;
+                    break;
+                case 33:
+                    toplam = 3;
+                    break;
+                case 34:
+                    toplam = 4;
+                    break;
+                case 35:
+                    toplam = 5;
+                    break;
+                case 36:
+                    toplam = 6;
+                    break;
+                }
+            }
+
+
+
+
+            if (namenumber)
+            {
+                for (auto& player : g_server->m_world.players) {
+                    if (netidspin == player.netid) {
+                        if (wry.find(player.name.substr(2).substr(0, player.name.length() - 4)) != -1) {
+                            std::string numb = wry.substr(wry.find("spun the wheel and got ") + 23, wry.length());
+                            string sw = numb.substr(0, numb.find("!"));
+                            if (player.name == g_server->m_world.local.name)
+                            {
+                                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                                if (pinglatency == false)
+                                {
+                                    variantlist_t va{ "OnNameChanged" };
+                                    va[1] = player.name + " `b[``" + sw + "`b]";
+                                    g_server->send(true, va, player.netid);
+                                }
+                                else {
+                                    locallastspin = " `b[``" + sw + "`b]";
+                                }
+                            }
+                            else
+                            {
+                                if (player.name == g_server->m_world.local.name) {}
+                                else
+                                {
+                                    variantlist_t va{ "OnNameChanged" };
+                                    va[1] = player.name + " `b[``" + sw + "`b]";
+                                    g_server->send(true, va, player.netid);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // 1sn sa 
+
+            if (packet->m_int_data == 1800)
+            {
+                if (realfake)//bunda amk 1 sn erme spin buglı
+                    varlist[2] = "`w[`2REAL`w]`w " + wry;
+                if (spyreme)
+                    varlist[2] = "`w[`2REAL`w]`w " + wry + " `^REME: `4" + std::to_string(toplam);
+                if (spyqq)
+                    varlist[2] = "`w[`2REAL`w]`w " + wry + " `^QQ: `2" + std::to_string(toplam);
+                g_server->send(true, varlist);
+                return true;
+            }
+            if (realfake)
+                varlist[2] = varlist[2].get_string() + " `0[`4FAKE`0]`w";
+            g_server->send(true, varlist);
+            return false;
         }
         if (fasttrash == true) {
             std::string itemid = content.substr(content.find("embed_data|itemID|") + 18, content.length() - content.find("embed_data|itemID|") - 1);
