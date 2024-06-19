@@ -928,19 +928,14 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
 
             if (packet->m_int_data == 1800)
             {
-                if (realfake)//bunda amk 1 sn erme spin buglı
-                    varlist[2] = "`w[`2REAL`w]`w " + wry;
+
                 if (spyreme)
                     varlist[2] = "`w[`2REAL`w]`w " + wry + " `^REME: `4" + std::to_string(toplam);
                 if (spyqq)
                     varlist[2] = "`w[`2REAL`w]`w " + wry + " `^QQ: `2" + std::to_string(toplam);
                 g_server->send(true, varlist);
                 return true;
-            }
-            if (realfake)
-                varlist[2] = varlist[2].get_string() + " `0[`4FAKE`0]`w";
-            g_server->send(true, varlist);
-            return false;
+
         }
         if (fasttrash == true) {
             std::string itemid = content.substr(content.find("embed_data|itemID|") + 18, content.length() - content.find("embed_data|itemID|") - 1);
