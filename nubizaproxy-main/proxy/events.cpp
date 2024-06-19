@@ -46,6 +46,14 @@ bool find_command(std::string chat, std::string name) {
 bool wrench = false;
 bool fastdrop = false;
 bool fasttrash = false;
+//spam
+bool enabled_color = false;
+int delay = 4000;
+bool son = false;
+std::string swxs = "0";
+std::string c_text = "";
+std::string aspam = "";
+//spam
 bool wrenchmsg = false; 
 bool wrenchspam = false; 
 bool automessage = false; 
@@ -239,8 +247,89 @@ bool events::out::generictext(std::string packet) {
             gt::send_log("`#Warping to " + name);
             g_server->send(false, "action|join_request\nname|" + name, 3);
             return true;
+	}
+		        else if (find_command(chat, "/")) {
+            son = !son;
+            std::thread([&]() {
+                const string colored_text_array[12] = { "`2", "`3", "`4", "`#", "`9", "`8", "`c", "`6", "`^" , "`b" , "`p" , "`5" };
+                while (son) {
+                    int baba = (rand() % 11) + 1;
+                    string send_ = colored_text_array[baba];
+                    if (enabled_color == true)
+                        g_server->send(false, "action|input\n|text|" + send_ + aspam);
+                    else
+                        g_server->send(false, "action|input\n|text|" + aspam);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+                }
+                }).detach();
+                return true;
+        }
+	        else if (find_command(chat, "spam")) {
+            if (enabled_color == true) {
+                swxs = "1";
+            }
+            else {
+                swxs = "0";
+            }
+            std::string msg;
+            msg =
+                "add_label_with_icon|big|`9Auto Spam Page|left|286|"
+                /*
+                If Didnt Enabled Colored Text Feature, It Will Write Normally.
+                If Enabled Colored Text Feature, It Will Automaticly Color Itself.
+                */
+                "\nadd_spacer|small"
+                "\nadd_smalltext|`b >> `0: `#If Enabled Colored Text Feature, It Will Automaticly Color Itself.|left|"
+                "\nadd_smalltext|`b >> `0: `#If Didnt Enabled Colored Text Feature, It Will Write Normally.|left|"
+                "\nadd_spacer|small"
+                "\nadd_checkbox|c_text|`5Enable `cColored `6Text|" +
+                swxs +
+                "|"
+                //"\nadd_text_input |spam_msg|`9Spam text: | " + gt:: + " |30"
+                "\nadd_text_input|spam_msg|`5Spam Text : ||50|"
+                //add_text_input|" + name + "|" + text + "|" + cont + "|" + to_string(size) + "|
+                "\nadd_text_input|delay_msg|`5Delay `2(Interval): |" + toString(delay) + "|4|"
+                "\nadd_textbox|`51000 `2Ms`5 = `01 Interval|left|2480|"
+                "\nend_dialog|spam_text|Cancel|Set|"; //"\nend_dialog|colored_text|Cancel|Set|";
+            variantlist_t send{ "OnDialogRequest" };
+            send[1] = msg;
+            g_server->send(true, send);
+            return true;
+        }			
+		    if (packet.find("spam_text") != -1) {
+        try {
+            if (packet.find("c_text|") != -1) {
+                std::string aaa = packet.substr(packet.find("ext|") + 4, packet.size());
+                std::string number = aaa.c_str();
+                while (!number.empty() && isspace(number[number.size() - 1]))
+                    number.erase(number.end() - (76 - 0x4B));
+                enabled_color = stoi(number);
+            }
+            if (packet.find("auto_enable|") != -1) {
+                std::string aaa = packet.substr(packet.find("ble|") + 4, packet.size());
+                std::string number = aaa.c_str();
+                while (!number.empty() && isspace(number[number.size() - 1]))
+                    number.erase(number.end() - (76 - 0x4B));
+                son = stoi(number);
+            }
+            if (packet.find("spam_msg|") != -1) {
+                std::string msg = packet.substr(packet.find("spam_msg|") + 9, packet.length() - packet.find("spam_msg") - 1);
+                aspam = msg;
+            }
+            if (packet.find("delay_msg|") != -1) {
+                std::string msg = packet.substr(packet.find("delay_msg|") + 10, packet.length() - packet.find("delay_msg") - 1);
+                delay = stoi(msg);
+            }
+
+        }
+        catch (exception a) {
+            std::cout << "error?";
+            std::cout << a.what();
+        }
+        return true;
+    }
           
-      } else if (find_command(chat, "door ")) {
+       else if (find_command(chat, "door ")) {
             std::string worldname = g_server->m_world.name.c_str();
             std::string idkntl = chat.substr(6);
             g_server->send(false, "action|join_request\nname|" + worldname + "|" + idkntl, 3);
