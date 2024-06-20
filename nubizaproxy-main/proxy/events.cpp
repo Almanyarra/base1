@@ -82,17 +82,17 @@ bool g4gtitle = false;
 
 // UTILS
 void force() {
-    Sleep(200);
+    sleep(200);
     fastdrop2 = false;
 }
 
 void forceunacc() {
-    Sleep(200);
+    sleep(200);
     takingunacc = false;
 }
 
 void forceacc() {
-    Sleep(500);
+    sleep(500);
     takingacc = false;
 }
 
@@ -100,19 +100,19 @@ void startBlink() {
     startedBlink = true;
     while (blink) {
         g_server->send(false, "action|setSkin\ncolor|3370516479");
-        Sleep(300);
+        sleep(300);
         g_server->send(false, "action|setSkin\ncolor|1348237567");
-        Sleep(300);
+        sleep(300);
         g_server->send(false, "action|setSkin\ncolor|2190853119");
-        Sleep(300);
+        sleep(300);
         g_server->send(false, "action|setSkin\ncolor|1685231359");
-        Sleep(300);
+        sleep(300);
         g_server->send(false, "action|setSkin\ncolor|2527912447");
-        Sleep(300);
+        sleep(300);
         g_server->send(false, "action|setSkin\ncolor|2864971775");
-        Sleep(300);
+        sleep(300);
         g_server->send(false, "action|setSkin\ncolor|3033464831");
-        Sleep(300);
+        sleep(300);
     }
 }
 
@@ -123,7 +123,7 @@ string toString(int number) {
 }
 
 void forcechangingname() {
-    Sleep(200);
+    sleep(200);
     changingname = false;
 }
 
@@ -138,7 +138,7 @@ void DropItem(int itemid, int count) {
     fastdrop2 = true;
     string packetC = "action|drop\nitemID|" + toString(itemid);
     g_server->send(false, packetC);
-    Sleep(50);
+    sleep(50);
     string packetD = "action|dialog_return\ndialog_name|drop_item\nitemID|" + toString(itemid) + "\ncount|" + toString(count) + "\n";
     g_server->send(false, packetD);
     thread(force).detach();
@@ -148,7 +148,7 @@ void DropItem(int itemid, string count) {
     fastdrop2 = true;
     string packetC = "action|drop\nitemID|" + toString(itemid);
     g_server->send(false, packetC);
-    Sleep(50);
+    sleep(50);
     string packetD = "action|dialog_return\ndialog_name|drop_item\nitemID|" + toString(itemid) + "\ncount|" + count + "\n";
     g_server->send(false, packetD);
     thread(force).detach();
@@ -157,12 +157,12 @@ void DropItem(int itemid, string count) {
 void DropItem(int itemid) {
     string packetD = "action|dialog_return\ndialog_name|drop_item\nitemID|" + toString(itemid) + "\ncount|1\n";
     fastdrop2 = true;
-    Sleep(50);
-    for (server::Item& item : server::inventory) {
+    sleep(50);
+  //  for (server::Item& item : server::inventory) {
         if (item.id == itemid) {
             string packetC = "action|drop\nitemID|" + toString(itemid);
             g_server->send(false, packetC);
-            Sleep(200);
+            sleep(200);
             if (item.count == 1) {
                 string packetD = "action|dialog_return\ndialog_name|drop_item\nitemID|" + toString(itemid) + "\ncount|1\n";
             }
@@ -175,13 +175,13 @@ void DropItem(int itemid) {
 
 void DoChat(string text) {
     g_server->send(false, "action|input\n|text|" + text);
-    Sleep(5);
+    sleep(5);
     return;
 }
 
 void Warp(string text) {
     g_server->send(false, "action|join_request\nname|" + text, 3);
-    Sleep(5);
+    sleep(5);
     return;
 }
 
