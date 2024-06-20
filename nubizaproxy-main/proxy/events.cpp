@@ -47,13 +47,20 @@ bool wrench = false;
 bool fastdrop = false;
 bool fasttrash = false;
 //spam
-bool enabled_color = false;
-int delay = 4000;
+bool enabled_color = true;
+int delay = 1;
 bool son = false;
 std::string swxs = "0";
-std::string c_text = "";
+std::string c_text = "Hello";
 std::string aspam = "";
 //spam
+//drop 
+bool cdrop = false;
+bool wldropfast = false;
+bool dropwl = false;
+int gdrop = 0;
+int droplanacakmiktar = 0;
+//asf
 bool wrenchmsg = false; 
 bool wrenchspam = false; 
 bool automessage = false; 
@@ -322,18 +329,25 @@ bool events::out::generictext(std::string packet) {
             }
 
         }
-        catch (exception a) {
-           // std::cout << "error?";
-           // std::cout << a.what();
-        }
-        return true;
-    }
+        
           
        else if (find_command(chat, "door ")) {
             std::string worldname = g_server->m_world.name.c_str();
             std::string idkntl = chat.substr(6);
             g_server->send(false, "action|join_request\nname|" + worldname + "|" + idkntl, 3);
             return true;
+	}
+			           else if (find_command(chat, "cd ")) {
+            std::string cdropcount = chat.substr(8);
+            dropwl = true;
+            g_server->send(false, "action|drop\n|itemID|242");
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|242|\ncount|" + cdropcount); //242
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            gt::send_log("`9Dropping `2" + cdropcount + "`9 Wl...");
+
+            return true;
+         
 
            } else if (find_command(chat, "pullall")) {
             std::string username = chat.substr(6);
