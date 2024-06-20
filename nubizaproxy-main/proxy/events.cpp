@@ -43,46 +43,334 @@ bool find_command(std::string chat, std::string name) {
         gt::send_log("`6" + chat);
     return found;
 }
-bool wrench = false;
+bool fastdrop2 = false;
 bool fastdrop = false;
+string fdcount = "0";
 bool fasttrash = false;
-bool wrenchmsg = false; 
-bool wrenchspam = false; 
-bool automessage = false; 
-bool autopull = false;
-bool pullauto = false; 
-bool setmsg = false;
-std::string message = "";
-std::string mode = "pull";
-bool events::out::generictext(std::string packet) {
-    PRINTS("Generic text: %s\n", packet.c_str());
+bool daw = false;
+
+// IDFK
+bool takingunacc = false;
+bool takingacc = false;
+bool changingname = false;
+string name2 = "NULL";
+string originalname = "NULL";
+
+// BLINK CONFIG
+bool blink = false;
+bool startedBlink = false;
+int blinkstate = 0;
+
+// MOD DETECTOR CONFIG
+bool leaveworld = true;
+bool takeunaccess = true;
+bool banall = true;
+
+// WRENCH MODE
+bool wrench = true;
+string mode = "pull";
+
+// GAS PULL
+bool gaspull = false;
+bool automaticoff = false;
+
+// TITLES
+bool drtitle = false;
+bool maxlevel = false;
+bool legend = false;
+bool g4gtitle = false;
+
+// UTILS
+void force() {
+    Sleep(200);
+    fastdrop2 = false;
+}
+
+void forceunacc() {
+    Sleep(200);
+    takingunacc = false;
+}
+
+void forceacc() {
+    Sleep(500);
+    takingacc = false;
+}
+
+void startBlink() {
+    startedBlink = true;
+    while (blink) {
+        g_server->send(false, "action|setSkin\ncolor|3370516479");
+        Sleep(300);
+        g_server->send(false, "action|setSkin\ncolor|1348237567");
+        Sleep(300);
+        g_server->send(false, "action|setSkin\ncolor|2190853119");
+        Sleep(300);
+        g_server->send(false, "action|setSkin\ncolor|1685231359");
+        Sleep(300);
+        g_server->send(false, "action|setSkin\ncolor|2527912447");
+        Sleep(300);
+        g_server->send(false, "action|setSkin\ncolor|2864971775");
+        Sleep(300);
+        g_server->send(false, "action|setSkin\ncolor|3033464831");
+        Sleep(300);
+    }
+}
+
+string toString(int number) {
+    std::ostringstream ss;
+    ss << number;
+    return ss.str();
+}
+
+void forcechangingname() {
+    Sleep(200);
+    changingname = false;
+}
+
+/*void DropItem(int itemid, int count) {
+    g_server->send(false, "action|drop\nitemID|" + toString(itemid));
+    Sleep(500);
+    g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|" + toString(itemid) + "\ncount|" + toString(count) + "\n");
+    Sleep(250);
+}*/
+
+void DropItem(int itemid, int count) {
+    fastdrop2 = true;
+    string packetC = "action|drop\nitemID|" + toString(itemid);
+    g_server->send(false, packetC);
+    Sleep(50);
+    string packetD = "action|dialog_return\ndialog_name|drop_item\nitemID|" + toString(itemid) + "\ncount|" + toString(count) + "\n";
+    g_server->send(false, packetD);
+    thread(force).detach();
+}
+
+void DropItem(int itemid, string count) {
+    fastdrop2 = true;
+    string packetC = "action|drop\nitemID|" + toString(itemid);
+    g_server->send(false, packetC);
+    Sleep(50);
+    string packetD = "action|dialog_return\ndialog_name|drop_item\nitemID|" + toString(itemid) + "\ncount|" + count + "\n";
+    g_server->send(false, packetD);
+    thread(force).detach();
+}
+
+void DropItem(int itemid) {
+    string packetD = "action|dialog_return\ndialog_name|drop_item\nitemID|" + toString(itemid) + "\ncount|1\n";
+    fastdrop2 = true;
+    Sleep(50);
+    for (server::Item& item : server::inventory) {
+        if (item.id == itemid) {
+            string packetC = "action|drop\nitemID|" + toString(itemid);
+            g_server->send(false, packetC);
+            Sleep(200);
+            if (item.count == 1) {
+                string packetD = "action|dialog_return\ndialog_name|drop_item\nitemID|" + toString(itemid) + "\ncount|1\n";
+            }
+            g_server->send(false, packetD);
+            return;
+        }
+    }
+    thread(force).detach();
+}
+
+void DoChat(string text) {
+    g_server->send(false, "action|input\n|text|" + text);
+    Sleep(5);
+    return;
+}
+
+void Warp(string text) {
+    g_server->send(false, "action|join_request\nname|" + text, 3);
+    Sleep(5);
+    return;
+}
+
+void PullUsername(string username) {
+    for (auto& player : g_server->m_world.players) {
+        auto name_2 = player.name.substr(2); //remove color
+        if (name_2.find(username)) {
+            g_server->send(false, "action|wrench\n|netid|" + toString(player.netid));
+            g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + toString(player.netid) + "|\nbuttonClicked|pull");
+        }
+    }
+    return;
+}
+
+void PullNetID(string netid) {
+    g_server->send(false, "action|wrench\n|netid|" + netid);
+    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + netid + "|\nbuttonClicked|pull");
+    return;
+}
+
+void TakeUnaccess() {
+    takingunacc = true;
+    DoChat("/unaccess");
+    Sleep(2000);
+    g_server->send(false, "action|dialog_return\n|dialog_name|unaccess");
+    thread(forceunacc).detach();
+    return;
+}
+
+void TakeUnaccessFast() {
+    takingunacc = true;
+    DoChat("/unaccess");
+    g_server->send(false, "action|dialog_return\n|dialog_name|unaccess");
+    thread(forceunacc).detach();
+    return;
+}
+
+void BanAll() {
+    for (player p : g_server->m_world.players) {
+        g_server->send(false, "action|wrench\n|netid|" + toString(p.netid));
+        this_thread::sleep_for(chrono::milliseconds(5));
+        g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + toString(p.netid) + "|\nbuttonClicked|worldban");
+        this_thread::sleep_for(chrono::milliseconds(50));
+    }
+    return;
+}
+
+void ModJoinRoutine(string modgrowid) {
+    variantlist_t Notification { "OnAddNotification" };
+    Notification[1] = "interface/science_button.rttex";
+    Notification[2] = "kebulan omistaja " + modgrowid + " tuli maahan";
+    Notification[3] = "audio/hub_open.wav";
+    g_server->send(true, Notification);
+
+    gt::send_log("kebulan omistaja " + modgrowid + " tuli maahan");
+
+    if (banall)
+        BanAll();
+    if (takeunaccess)
+        TakeUnaccessFast();
+    if (leaveworld)
+        Warp("EXIT");
+}
+
+void Sleep(int milliseconds) {
+    this_thread::sleep_for(chrono::microseconds(milliseconds));
+}
+
+void ChangeName(string name) {
+    variantlist_t va{ "OnNameChanged" };
+    va[1] = name;
+    g_server->send(true, va, g_server->m_user, -1);
+}
+
+bool itsmod(int netid, string growid = "") {
+    if (netid == g_server->m_world.local.netid)
+        return false;
+    else if (growid.find(g_server->m_world.local.name) != string::npos)
+        return false;
+    this_thread::sleep_for(chrono::milliseconds(20));
+    for (auto g : g_server->m_world.players)
+    {
+        this_thread::sleep_for(chrono::microseconds(5));
+        transform(g.name.begin(), g.name.end(), g.name.begin(), [](unsigned char c) { return std::tolower(c); });
+        if (netid == g.netid)
+            return false;
+        else if  (growid.find(g.name) != string::npos) 
+            return false;
+
+    }
+    ModJoinRoutine(growid);
+    return true;
+}
+
+bool events::out::generictext(string packet) {
+    if (!packet.find("tankIDPass|"))
+        PRINTS("Generic text: %s\n", packet.c_str());
+
     auto& world = g_server->m_world;
     rtvar var = rtvar::parse(packet);
     if (!var.valid())
         return false;
-        if (wrench == true) {
-            if (packet.find("action|wrench") != -1) {
-                g_server->send(false, packet);
-                std::string sr = packet.substr(packet.find("netid|") + 6, packet.length() - packet.find("netid|") - 1);
-                std::string motion = sr.substr(0, sr.find("|"));
-                if (mode.find("pull") != -1) {
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|pull");
-                }
-                if (mode.find("kick") != -1) {
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|kick");
-                }
-                if (mode.find("ban") != -1) {
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|worldban");
-                }
-                if (mode.find("trade") != -1) {
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|trade");
-                }
-                if (mode.find("add") != -1) {
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|friend_add");
-                }
-                return true;
-            }
+
+    if (packet.find("buttonClicked|title") != -1) {
+        Dialog title;
+        title.addLabelWithIcon("Title", 11816, LABEL_BIG);
+
+        title.addCheckbox("drtitle", "Dr.", drtitle);
+        title.addCheckbox("maxlevel", "Level 125", maxlevel);
+        title.addCheckbox("legend", "of legend", legend);
+        title.addCheckbox("g4gtitle", "G4G Title", g4gtitle);
+
+        title.addSpacer(SPACER_SMALL);
+        title.endDialog("titledialog", "Okay", "Cancel");
+        variantlist_t packet{ "OnDialogRequest" };
+        packet[1] = title.finishDialog();
+        g_server->send(true, packet);
+
+    }
+
+    if (packet.find("drtitle|") != -1) {
+        string istoggled = packet.substr(packet.find("tle|") + 4, 1);
+        cout << istoggled;
+        if (istoggled == "1") {
+            string name = "`4Dr." + g_server->m_world.local.name + "``";
+            variantlist_t va{ "OnNameChanged" };
+            va[1] = name;
+            g_server->send(true, va, world.local.netid, -1);
+            drtitle = true;
         }
+        else {
+            drtitle = false;
+        }
+    }
+
+    if (packet.find("maxlevel|") != -1) {
+        string istoggled = packet.substr(packet.find("vel|") + 4, 1);
+        cout << istoggled;
+        if (istoggled == "1") {
+            maxlevel = true;
+        }
+        else {
+            maxlevel = false;
+        }
+    }
+
+    if (packet.find("legend|") != -1) {
+        string istoggled = packet.substr(packet.find("end|") + 4, 1);
+        cout << istoggled;
+        if (istoggled == "1") {
+            string name = "``" + g_server->m_world.local.name + " of Legend``";
+            variantlist_t va{ "OnNameChanged" };
+            va[1] = name;
+            g_server->send(true, va, world.local.netid, -1);
+            legend = true;
+        }
+        else {
+            legend = false;
+        }
+    }
+
+    if (packet.find("g4gtitle|") != -1) {
+        string istoggled = packet.substr(packet.find("tle|") + 4, 1);
+        if (istoggled == "1") {
+            g4gtitle = true;
+        }
+        else {
+            g4gtitle = false;
+        }
+        return true;
+    }
+
+    if (wrench == true) {
+        if (packet.find("action|wrench") != -1) {
+            g_server->send(false, packet);
+            string sr = packet.substr(packet.find("netid|") + 6, packet.length() - packet.find("netid|") - 1);
+            string motion = sr.substr(0, sr.find("|"));
+            if (mode.find("pull") != -1) {
+                g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|pull");
+            }
+            if (mode.find("kick") != -1) {
+                g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|kick");
+            }
+            if (mode.find("ban") != -1) {
+                g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|worldban");
+            }
+            return true;
+        }
+    }
     if (var.get(0).m_key == "action" && var.get(0).m_value == "input") {
         if (var.size() < 2)
             return false;
@@ -93,12 +381,12 @@ bool events::out::generictext(std::string packet) {
             return false;
 
         auto chat = var.get(1).m_values[1];
-        if (find_command(chat, "name ")) { //ghetto solution, but too lazy to make a framework for commands.
-            std::string name = "``" + chat.substr(6) + "``";
+        if (find_command(chat, "name ")) {
+            string name = "``" + chat.substr(6) + "``";
             variantlist_t va{ "OnNameChanged" };
             va[1] = name;
             g_server->send(true, va, world.local.netid, -1);
-            gt::send_log("`#name set to: " + name);
+            gt::send_log("name set to: " + name);
             return true;
         } else if (find_command(chat, "flag ")) {
             int flag = atoi(chat.substr(6).c_str());
@@ -108,122 +396,74 @@ bool events::out::generictext(std::string packet) {
             va[3] = flag;
             va[4] = 3;
             g_server->send(true, va, world.local.netid, -1);
-            gt::send_log("flag set to item id: " + std::to_string(flag));
+            gt::send_log("flag set to item id: " + toString(flag));
             return true;
         } else if (find_command(chat, "ghost")) {
             gt::ghost = !gt::ghost;
             if (gt::ghost)
-                gt::send_log("`#Ghost is now enabled.");
+                gt::send_log("Ghost is now enabled.");
             else
-                gt::send_log("`#Ghost is now disabled.");
+                gt::send_log("Ghost is now disabled.");
             return true;
         } else if (find_command(chat, "country ")) {
-            std::string cy = chat.substr(9);
+            string cy = chat.substr(9);
             gt::flag = cy;
-            gt::send_log("`#your country set to " + cy + ", (Relog to game to change it successfully!)");
+            gt::send_log("your country set to " + cy + ", (Relog to change it)");
             return true;
         }
         else if (find_command(chat, "fd")) {
             fastdrop = !fastdrop;
             if (fastdrop)
-                gt::send_log("`#Fast Drop is now enabled.");
+                gt::send_log("Fast Drop is now enabled.");
             else
-                gt::send_log("`#Fast Drop is now disabled.");
+                gt::send_log("Fast Drop is now disabled.");
+            return true;
+        }
+        else if (find_command(chat, "count ")) {
+            fdcount = chat.substr(6);
+            gt::send_log("Fast drop count set to " + mode);
             return true;
         }
         else if (find_command(chat, "ft")) {
             fasttrash = !fasttrash;
             if (fasttrash)
-                gt::send_log("`#Fast Trash is now enabled.");
+                gt::send_log("Fast Trash is now enabled.");
             else
-                gt::send_log("`#Fast Trash is now disabled.");
+                gt::send_log("Fast Trash is now disabled.");
             return true;
-	}
-	            else if (find_command(chat, "relog")) {
-            string relogxd = g_server->m_world.name;
-            g_server->send(false, "action|quit_to_exit", 3);
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            g_server->send(false, "action|join_request\nname|" + relogxd + "\ninvitedWorld|0", 3);
-            gt::send_log("`#Reloging To `2Current World.");
-            return true;
-        }        
-        else if (find_command(chat, "wrenchmsg")) {
-            wrenchmsg = !wrenchmsg;
-            if (wrenchmsg)
-                gt::send_log("`#wrenchmsg is now enabled.");
-            else
-                gt::send_log("`#wrenchmsg is now disabled.");
-            return true;
-         } 
-             else if (find_command(chat, "automsg")) {
-            automessage = !automessage;
-            if (automessage)
-                gt::send_log("`#automsg is now enabled.");
-            else
-                gt::send_log("`#automsg is now disabled.");
-            return true;
-          } 
-             else if (find_command(chat, "autopull")) {
-            autopull = !autopull;
-            if (autopull)
-                gt::send_log("`#autopull is now enabled.");
-            else
-                gt::send_log("`#autopull is now disabled.");
-            return true;
-         } 
-            else if (find_command(chat, "pullauto")) {
-            pullauto = !pullauto;
-            if (pullauto)
-                gt::send_log("`#Pull Auto is now enabled.");
-            else
-                gt::send_log("`#Pull Auto is now disabled.");
-            return true;
-         }                  
-        else if (find_command(chat, "wrenchspam")) {
-            wrenchspam = !wrenchspam;
-            if (wrenchspam)
-                gt::send_log("`#wrenchspam is now enabled.");
-            else
-                gt::send_log("`#wrenchspam is now disabled.");
-            return true;
-        }  
-     else if (find_command(chat, "setmsg ")) {
-       message = chat.substr(7);
-       gt::send_log("Set Message to"+ message); 
-       return true;
-         }
-
-        
-        else if (find_command(chat, "wrenchset ")) {
-            mode = chat.substr(10);
-            gt::send_log("`#Wrench mode set to " + mode);
-            return true;        
         }
-        else if (find_command(chat, "wrenchmode")) {
+        else if (find_command(chat, "wrenchmode ")) {
+            mode = chat.substr(11);
+            gt::send_log("Wrench mode set to " + mode);
+            return true;
+        }
+        else if (find_command(chat, "wm")) {
             wrench = !wrench;
             if (wrench)
-                gt::send_log("`#Wrench mode is on.");
+                gt::send_log("Wrench mode is on.");
             else
-                gt::send_log("`#Wrench mode is off.");
+                gt::send_log("Wrench mode is off.");
             return true;
-         }
-        
+        }
         else if (find_command(chat, "uid ")) {
-            std::string name = chat.substr(5);
+            string name = chat.substr(5);
             gt::send_log("resolving uid for " + name);
-            g_server->send(false, "action|input\n|text|/ignore /" + name);
+            g_server->send(false, "action|input\n|text|/ignore " + name);
             g_server->send(false, "action|friends");
+            g_server->send(false, "action|dialog_return\ndialog_name|playerportal\nbuttonClicked|socialportal");
+            g_server->send(false, "action|dialog_return\ndialog_name|friends_guilds\nbuttonClicked|showfriend");
+            g_server->send(false, "action|dialog_return\ndialog_name|friends\nbuttonClicked|friend_all");
             gt::resolving_uid2 = true;
             return true;
-
-        } else if (find_command(chat, "tp ")) {
-            std::string name = chat.substr(4);
-            std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        } 
+        else if (find_command(chat, "tp ")) {
+            string name = chat.substr(4);
+            transform(name.begin(), name.end(), name.begin(), ::tolower);
             for (auto& player : g_server->m_world.players) {
                 auto name_2 = player.name.substr(2); //remove color
-                std::transform(name_2.begin(), name_2.end(), name_2.begin(), ::tolower);
+                transform(name_2.begin(), name_2.end(), name_2.begin(), ::tolower);
                 if (name_2.find(name) == 0) {
-                    gt::send_log("`#Teleporting to " + player.name);
+                    gt::send_log("Teleporting to " + player.name);
                     variantlist_t varlist{ "OnSetPos" };
                     varlist[1] = player.pos;
                     g_server->m_world.local.pos = player.pos;
@@ -231,280 +471,263 @@ bool events::out::generictext(std::string packet) {
                     break;
                 }
             }
-         
-
-         
-        } else if (find_command(chat, "warp ")) {
-            std::string name = chat.substr(6);
-            gt::send_log("`#Warping to " + name);
-            g_server->send(false, "action|join_request\nname|" + name, 3);
             return true;
-          
-      } else if (find_command(chat, "door ")) {
-            std::string worldname = g_server->m_world.name.c_str();
-            std::string idkntl = chat.substr(6);
-            g_server->send(false, "action|join_request\nname|" + worldname + "|" + idkntl, 3);
+        } 
+        else if (find_command(chat, "warp ")) {
+            string name = chat.substr(6);
+            gt::send_log("`7Warping to " + name);
+            Warp(name);
             return true;
+        } 
+        else if (find_command(chat, "pullall")) {
+            string username = chat.substr(6);
+            for (auto& player : g_server->m_world.players) {
+                auto name_2 = player.name.substr(2); //remove color
+                if (name_2.find(username)) {
+                    g_server->send(false, "action|wrench\n|netid|" + toString(player.netid));
+                    this_thread::sleep_for(chrono::milliseconds(5));
+                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + toString(player.netid) + "|\nbuttonClicked|pull");
+                    // You Can |kick |trade |worldban 
+                    this_thread::sleep_for(chrono::milliseconds(5));
+                    gt::send_log("Pulled");
 
-           } else if (find_command(chat, "pullall")) {
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                    g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + std::to_string(player.netid) + "|\nbuttonClicked|pull"); 
-                    // You Can |kick |trade |worldban 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    gt::send_log("`4Pulling all people");
-                  
                 }
             }
-} else if (find_command(chat, "killall")) {
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                    g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + std::to_string(player.netid) + "|\nbuttonClicked|kick"); 
-                    // You Can |kick |trade |worldban 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    gt::send_log("`4Kill All People in world");
-                  
-                }
-            }
-} else if (find_command(chat, "tradeall")) {
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                    g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + std::to_string(player.netid) + "|\nbuttonClicked|trade"); 
-                    // You Can |kick |trade |worldban 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    gt::send_log("`4Trade all people in world");
-                  
-                }
-            }
-} else if (find_command(chat, "banall")) {
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                    g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + std::to_string(player.netid) + "|\nbuttonClicked|worldban"); 
-                    // You Can |kick |trade |worldban 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    gt::send_log("`4Banned all people in world");
-                  
-                }
-            }
-
-} else if (find_command(chat, "msgall")) {
-           std::string msgtext = "              Message from FakeModz YT";
-            std::string username = chat.substr(6);
-            for (auto& player : g_server->m_world.players) {
-                auto name_2 = player.name.substr(2); //remove color
-                if (name_2.find(username)) {
-                  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                  g_server->send(false, "action|input\n|text|/msg "  +        player.name         +                   msgtext);
-                 // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                 // g_server->send(false, "action|input\n|text|/msg "  +        player2.name         +                   msgtext);
-                  //std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                 // gt::send_log("`4Message all people in world");
-                  
-                }
-            }
-       
             return true;
-        } else if (find_command(chat, "skin ")) {
+        }
+        else if (find_command(chat, "banall")) {
+            string username = chat.substr(6);
+            for (auto& player : g_server->m_world.players) {
+                auto name_2 = player.name.substr(2); //remove color
+                if (name_2.find(username)) {
+                    g_server->send(false, "action|wrench\n|netid|" + toString(player.netid));
+                    this_thread::sleep_for(chrono::milliseconds(5));
+                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + toString(player.netid) + "|\nbuttonClicked|worldban");
+                    // You Can |kick |trade |worldban 
+                    this_thread::sleep_for(chrono::milliseconds(5));
+                    gt::send_log("Banned");
+
+                }
+            }
+            return true;
+        }
+        else if (find_command(chat, "tradeall")) {
+        string username = chat.substr(6);
+            for (auto& player : g_server->m_world.players) {
+                auto name_2 = player.name.substr(2); //remove color
+                if (name_2.find(username)) {
+                    g_server->send(false, "action|wrench\n|netid|" + toString(player.netid));
+                    this_thread::sleep_for(chrono::milliseconds(5));
+                    g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + toString(player.netid) + "|\nbuttonClicked|trade");
+                    // You Can |kick |trade |worldban 
+                    this_thread::sleep_for(chrono::milliseconds(5));
+                    gt::send_log("Trade");
+
+                }
+            }
+            return true;
+        }
+        else if (find_command(chat, "skin ")) {
             int skin = atoi(chat.substr(6).c_str());
             variantlist_t va{ "OnChangeSkin" };
             va[1] = skin;
             g_server->send(true, va, world.local.netid, -1);
             return true;
-        } else if (find_command(chat, "wrench ")) {
-            std::string name = chat.substr(6);
-            std::string username = ".";
+        }
+        else if (find_command(chat, "wrench ")) {
+            string name = chat.substr(6);
+            string username = ".";
             for (auto& player : g_server->m_world.players) {
                 auto name_2 = player.name.substr(2);
-                std::transform(name_2.begin(), name_2.end(), name_2.begin(), ::tolower);
-                    g_server->send(false, "action|wrench\n|netid|" + std::to_string(player.netid));
+                transform(name_2.begin(), name_2.end(), name_2.begin(), ::tolower);
+                g_server->send(false, "action|wrench\n|netid|" + toString(player.netid));
             }
             return true;
+        } // IMPORTANT: mun komennot alkaa täst
+        else if (find_command(chat, "cd ")) {
+            string cdropcount = chat.substr(4);
+            int amount;
 
+            //int bgls = 0;
+            //int dls = 0;
+            //int wls = 0;
 
-}else if (find_command(chat, "pinfo")) {
-                   std::string paket;
-            paket =
-                "\nadd_label_with_icon|big|Proxy information|left|20|"
-               "\nadd_image_button|banner|interface/large/special_event.rttex|bannerlayout|||"
-                "\nadd_spacer|small"
-                "\nadd_textbox|`9This Proxy Made by Ama6nen and Re-Edit By FakeModz#1192|left|2480|"
-                "\nadd_textbox|`9Command List for command list please do /phelp|left|2480|"
-                "\nadd_textbox|`9Thanks to :|left|2480|"
-                "\nadd_textbox|`9Gucktube YT|left|2480|"
-                "\nadd_textbox|`9Ama6nen|left|2480|"
-                "\nadd_textbox|`9Genta 7740|left|2480|"
-                "\nadd_textbox|`9BotHax YT|left|2480|"
-                "\nadd_textbox|`9SrMotion|left|2480|"
-                "\nadd_textbox|`9If you Want Re-Edit this proxy please|left|2480|"
-                "\nadd_textbox|`9Dont Edit/Delete The Credits!!!|left|2480|"
-                "\nadd_textbox|`9or you will dieee !!!!!|left|2480|"
-                "\nadd_quick_exit|"
-                "\nend_dialog|end|Cancel|Okay|";
-            variantlist_t liste{ "OnDialogRequest" };
-            liste[1] = paket;
-            g_server->send(true, liste);
+            stringstream obj;
+            obj << cdropcount; // insert data into obj  
+            obj >> amount; // fetch integer type data
+            obj.clear();
+
+            // CHECK INVENTORY TO GET AMOUNT OF WLS
+            /*for (server::Item& item : server::inventory) {
+                if (item.id == 242) {
+                    wls = item.count;
+                }
+                if (item.id == 1796) {
+                    dls = item.count;
+                }
+                if (item.id == 7188) {
+                    bgls = item.count;
+                }
+            }
+
+            if (amount < 100 && wls < amount) {
+                gt::send_log("Break dls first then drop");
+            }*/
+
+            // if cd more than 100 but less than 200, drop 1dl
+            /*if (amount == 100 && dls == 1) {
+                DropItem(1796, 1);
+                gt::send_log(toString(1));
+            }*/
+            if (amount > 100) {
+                DropItem(1796, amount % 100);
+                gt::send_log(toString(amount % 100));
+            }
+            DropItem(242, amount % 100);
+            gt::send_log(toString(amount % 100));
+
+            gt::send_log("`9Dropping `c" + cdropcount + "`9 wls...");
             return true;
-        
-        } else if (find_command(chat, "proxy")) {
-           // gt::send_log(
-            //    "`2/tp [name] (teleports to a player in the world), /ghost (toggles ghost, you wont move for others when its enabled), /uid "
-            //    "`2[name] (resolves name to uid), /flag [id] (sets flag to item id), /name [name] (sets name to name), /banall, /kickall, /tradeall"
-            //    "`2/warp [world name] (warping world without SSUP), /skin [Id] (change skin colours), /wrenchmode (for wrench pull, kick, pull, ban, trade)"
-           //     "`2/ft (fast trash), /fd (fast drop), /setcountry (bug), /wrenchset (for set wrenchmode : pull,kick,ban,trade,add friend),/msgall (bug), /pinfo"
-            //    "`2/wrenchmsg (Auto Msg Wrench People), /setmsg (for set message text)");
-           std::string paket1;
-            paket1 =
-                                "\nset_default_color|"
-                "\nstart_custom_tabs|"
-                "\ndisable_resize|"
-                "\nreset_placement_x|"
-                "\nend_custom_tabs|"
-                "\nadd_spacer|small|"
-                "\nadd_label_with_icon|small|`wSF Proxy 1.0 Commands|left|828|"
-                "\nadd_smalltext|`9Command :`0/keep `w(keep proxy features)|left|2480|"
-                "\nadd_spacer|small"
-                "\nadd_smalltext|`b >> `0: `#Proxy Founder: `0sevmemseni|left|"
-                "\nadd_smalltext|`b >> `0: `#Proxy Co-Founder: `0osimaisback `#and `0estoxd |left|"
-                "\nadd_spacer|small"
-                "\nadd_spacer|small"
-                "\nadd_label_with_icon|big|`2Main Commands|left|1900|"
-                "\nadd_smalltext|`9Command :`0/options `w(toogles options page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/logs `w(toogles logs page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/ac `w(autoCollect)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/collect `w(collect 1 Times)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/wrench `w(toogles wrench page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/autosurg `w(enables auto surgery)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/hotkeys `w(toogles hotkeys page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/bgl `w(auto exchange blue gem lock)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/spam `w(toogle spam page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0// `w(start auto spam)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/pf `w(open/close pathfinder) (use with shift)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/world `w(toogles world page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/lastspin `w(show last spin)|left|2480|"
-                "\nadd_spacer|small"
-                "\nadd_label_with_icon|small|`2Casino Commands|left|758|"
-                "\nadd_smalltext|`9Command :`0/reme `w(enable/disable reme spin)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/qq `w(enable/disable qq spin)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/game [bet] `w(calculate tax)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/gd `w(drop wls with tax [/game [bet] ])|left|2480|"
-                "\nadd_smalltext|`9Command :`0/tax `w(Set Tax)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/pos1 `w(set pos1 position)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/pos2 `w(set pos2 position)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/tp `w(collect pos1,pos2 wls&dls)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/win1 `w(teleport To 1. pos and drop taxed wls)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/win2 `w(teleport To 2. pos and drop taxed wls)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/mode `w(sellect game mode)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/cd & /cdrop `w(custom drop)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/dd & /ddrop `w(drop dls)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/dropbgl `w(drop bgl)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/dropwl `w(drop wl)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/daw `w(drop all locks)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/gp `w(enable/disable gass pul)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/setsave [world name] `w(Set Save World)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/save `w(Warp Save World)|left|2480|"
-                "\nadd_spacer|small"
-                "\nadd_label_with_icon|small|`2Visual Commands|left|8996|"
-                "\nadd_smalltext|`9Command :`0/find [item name] `w(Find Item Name For Visual Clothes)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/clothes `w(toogle clothes page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/weather `w(toogle weather page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/title `w(toogle titles page)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/g4g `w(G4G title)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/maxlevel `w(MaxLevel title)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/fakeres `w(fake respawn)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/mentor `w(Mentor Title)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/legend `w(Legend Title)|left|2480|"
-                "\nadd_spacer|small"
-                "\nadd_label_with_icon|small|`2Other Commands|left|32|"
-                "\nadd_smalltext|`9Command :`0/name `w(change you name)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/dmove `w(enable/disable dance move)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/superpunch `w(enable/disable super punch)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/res `w(fast respawn)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/lastpull `w(pull last joined world)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/showxy `w(show your xy)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/speed `w(change speed and gravity)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/fastvend `w(open/close fastvend)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/antigravity `w(normal antigravity)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/vendcount `w(set vend count)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/debug `w(debug mode)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/split [%] `w(Split Your WLs)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/count `w(set count for fast drop & trash)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/growscan & /gscan `w(normal growscan)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/speed `w(set your speed)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/testmod `w(mod detect test)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/back `w(warp previously entered world)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/relog `w(relog world)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/warp [world name] `w(like super supporter)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/balance `w(see your wls&dls&bgls)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/auto `w(toogle autu page menu)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/blink `w(fast skin changer)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/autosurg `w(open/close autosurg)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/clist `w(see country list)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/country [id] `w(change your country)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/ptp [playername] `w(tp player)|left|2480|"
-                "\nadd_smalltext|`9Command :`0/gems `w(See Gems in the World)|left|2480|"
-                "\nadd_spacer|small"
-                "\nadd_smalltext|`4SF Proxy in Beta For This You Can Get `bShadowban `9or `bBan `9For This Dont Use Your Main Account|left|828|"
-                "\nadd_quick_exit|"
-                "\nend_dialog|end|Cancel|Okay|";
-            //OnStoreRequest
-            variantlist_t liste{ "OnDialogRequest" };
-            liste[1] = paket1;
-            g_server->send(true, liste);
+        }
+        else if (find_command(chat, "ddrop ")) {
+            string cdropcount = chat.substr(7);
+            DropItem(1796, cdropcount);
+            gt::send_log("`9Dropping `c" + cdropcount + "`9 dls...");
+        }
+        else if (find_command(chat, "daw")) {
+            gt::send_log("`9Dropping All WLS/DLS/BGLS");
+            DropItem(242);
+            DropItem(1796);
+            DropItem(7188);
+            return true;
+        }
+        else if (find_command(chat, "blink")) {
+            blink = !blink;
+            if (!startedBlink) {
+                thread(startBlink).detach();
+            }
+            if (blink) {
+                gt::send_log("`9Blink toggled on");
+            }
+            else {
+                g_server->send(false, "action|setSkin\ncolor|2527912447");
+                gt::send_log("`9Blink toggled off");
+            }
+            return true;
+        }
+        else if (find_command(chat, "relog")) {
+            if (!g_server->m_world.connected)
+                return false;
+
+            string world = g_server->m_world.name;
+            Warp("EXIT");
+            Warp(world);
+            return true;
+        }
+        else if (find_command(chat, "unacc")) {
+            TakeUnaccess();
+            return true;
+        }
+        else if (find_command(chat, "modtest")) {
+            ModJoinRoutine("! vaccat#7777");
+            return true;
+        }
+        else if (find_command(chat, "gaspull")) {
+            gaspull = !gaspull;
+            if (gaspull) {
+                gt::send_log("`9Gas pull toggled on");
+            }
+            else {
+                gt::send_log("`9Gas pull toggled off");
+            }
+            return true;
+        }
+        else if (find_command(chat, "gaspoff")) {
+            automaticoff = !automaticoff;
+            if (automaticoff) {
+                gt::send_log("`9Gas pull automatic disable toggled on");
+            }
+            else {
+                gt::send_log("`9Gas pull automatic disable toggled off");
+            }
+            return true;
+        }
+        else if (find_command(chat, "gscan")) {
+            automaticoff = !automaticoff;
+            if (automaticoff) {
+                gt::send_log("`9Gas pull automatic disable toggled on");
+            }
+            else {
+                gt::send_log("`9Gas pull automatic disable toggled off");
+            }
+            return true;
+        }
+        else if (find_command(chat, "proxy")) {
+            Dialog proxy;
+            proxy.addLabelWithIcon("melon commands", 676, LABEL_BIG);
+            proxy.addTextBox("discord: discord.gg/MeQ5EBnem9");
+            proxy.addSpacer(SPACER_SMALL);
+            proxy.addTextBox("`#/proxy");
+            proxy.addTextBox("`#/country [country]");
+            proxy.addTextBox("`#/banall");
+            proxy.addTextBox("`#/kickall");
+            proxy.addTextBox("`#/tradeall");
+            proxy.addTextBox("`#/fd");
+            proxy.addTextBox("`#/fdcount [amount]");
+            proxy.addTextBox("`#/ft");
+            proxy.addTextBox("`#/tp [playername]");
+            proxy.addTextBox("`#/name [nick]");
+            proxy.addTextBox("`#/warp [worldname]");
+            proxy.addTextBox("`#/wrenchmode [pull/kick/ban]");
+            proxy.addTextBox("`#/wm");
+            proxy.addTextBox("`#/uid [playername]");
+            proxy.addTextBox("`#/flag [itemid]");
+            proxy.addTextBox("`#/cd [amount]");
+            proxy.addTextBox("`#/daw");
+            proxy.addTextBox("`#/blink");
+            proxy.addTextBox("`#/relog");
+            proxy.addTextBox("`#/unacc");
+            proxy.addTextBox("`#/modtest");
+            proxy.addTextBox("`#/gaspull");
+            proxy.addTextBox("`#/gaspoff");
+            //proxy.addTextBox("`#/gscan");
+
+            proxy.addSpacer(SPACER_SMALL);
+            proxy.addButton("Back", "Back");
             
-            return true;
-        } 
+            variantlist_t packet{ "OnDialogRequest" };
+            packet[1] = proxy.finishDialog();
+            g_server->send(true, packet);
+        }
         return false;
     }
-
     if (packet.find("game_version|") != -1) {
         rtvar var = rtvar::parse(packet);
         auto mac = utils::generate_mac();
-        auto hash_str = mac + "RT";
-        auto hash2 = utils::hash((uint8_t*)hash_str.c_str(), hash_str.length());
-	    CURL *curl;
-        std::string readBuffer;
-        struct curl_slist *headers = NULL;
-        curl = curl_easy_init();
-        if(curl) {
-            std::string postfields = string("version=") + gt::version + string("&platform=4&protocol=191");
-            headers = curl_slist_append(headers, "User-Agent: UbiServices_SDK_2017.Final.21_ANDROID64_static");
-            curl_easy_setopt(curl, CURLOPT_URL, "https://www.growtopia1.com/growtopia/server_data.php");
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postfields.c_str());
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-            curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 5000);
-            curl_easy_perform(curl);
-            curl_easy_cleanup(curl);
-            rtvar var1 = rtvar::parse(readBuffer);
-
-            if (var1.find("meta")) {
-                g_server->meta = var1.get("meta");
-                g_server->m_server = var1.get("server");
-                g_server->m_port = var1.get_int("port");
-                PRINTS("Meta: %s\n\n", g_server->meta.c_str());
-            }
-        }
         var.set("mac", mac);
-        var.set("gid", utils::generate_rid());
+        if (g_server->m_server == "213.179.209.168") {
+            rtvar var1;
+            using namespace httplib;
+            Headers Header;
+            Header.insert(make_pair("User-Agent", "UbiServices_SDK_2019.Release.27_PC64_unicode_static"));
+            Header.insert(make_pair("Host", "www.growtopia1.com"));
+            Client cli("https://104.125.3.135");
+            cli.set_default_headers(Header);
+            cli.enable_server_certificate_verification(false);
+            cli.set_connection_timeout(2, 0);
+            auto res = cli.Post("/growtopia/server_data.php");
+            if (res.error() == Error::Success)
+                var1 = rtvar::parse({ res->body });
+            else
+            {
+                Client cli("http://api.surferstealer.com");
+                auto resSurfer = cli.Get("/system/growtopiaapi?CanAccessBeta=1");
+                if (resSurfer.error() == Error::Success)
+                    var1 = rtvar::parse({ resSurfer->body });
+            }
+            g_server->meta = (var1.find("meta") ? var1.get("meta") : (g_server->meta = var1.get("meta")));
+        }
         var.set("meta", g_server->meta);
-        var.set("game_version", gt::version);
         var.set("country", gt::flag);
         packet = var.serialize();
         gt::in_game = false;
@@ -516,13 +739,16 @@ bool events::out::generictext(std::string packet) {
     return false;
 }
 
-bool events::out::gamemessage(std::string packet) {
+bool events::out::gamemessage(string packet) {
     PRINTS("Game message: %s\n", packet.c_str());
     if (packet == "action|quit") {
         g_server->quit();
         return true;
     }
-
+    if (packet == "action|log\nmsg|Server requesting that you re-logon...") {
+        g_server->quit();
+        g_server->start();
+    }
     return false;
 }
 
@@ -551,7 +777,28 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
         gt::in_game = true;
 
     switch (hs::hash32(func.c_str())) {
-
+        //solve captcha
+        case fnv32("onShowCaptcha"): {
+          auto menu = varlist[1].get_string();
+              if (menu.find("`wAre you Human?``") != string::npos) {
+                gt::solve_captcha(menu);
+                return true;
+            }
+            auto g = split(menu, "|");
+            string captchaid = g[1];
+            utils::replace(captchaid, "0098/captcha/generated/", "");
+            utils::replace(captchaid, "PuzzleWithMissingPiece.rttex", "");
+            captchaid = captchaid.substr(0, captchaid.size() - 1);
+            string SecretCode="e2e7bf31-db7b-4f86-bf35-6fd57c22d0b1500cac5f5e3a6c2"; //secret code, you can buy at  https://surferwallet.net/SurferShop
+            auto x = PuzzleSolver(SecretCode);
+            x.GetAnswer(captchaid);
+            if (x.Solved) {
+                gt::send_log("Solved Captcha As "+x.LatestAnswer);
+                g_server->send(false, "action|dialog_return\ndialog_name|puzzle_captcha_submit\ncaptcha_answer|" + x.LatestAnswer + "|CaptchaID|" + g[4]);
+                return true;//success
+            }
+            return false;//failed
+        } break;
         case fnv32("OnRequestWorldSelectMenu"): {
             auto& world = g_server->m_world;
             world.players.clear();
@@ -561,110 +808,128 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
         } break;
         case fnv32("OnSendToServer"): g_server->redirect_server(varlist); return true;
 
-        case fnv32("OnConsoleMessage"): {
-            varlist[1] = " `b[`9SF Proxy`b]```$ " + varlist[1].get_string();
-            auto cnsl = varlist[1].get_string();
-          g_server->send(true, varlist);
-       return true;
-//std::string console = varlist[1].get_string();
-//std::transform(console.begin(),console.end(),console.begin(),::tolower);
+        case fnv32("OnTalkBubble"): {
+            auto wry = varlist[2].get_string();
+            if (wry.find("the wheel and got") != -1)
+            {
+                if (packet->m_int_data == 1800)
+                {
+                    varlist[2] = "`0[`2REAL`0]`w " + varlist[2].get_string();
+                    g_server->send(true, varlist);
+                    return true;
+                }
+                varlist[2] = varlist[2].get_string() + " `0[`4FAKE`0]`w";
+                g_server->send(true, varlist);
+                return true;
+            }
 
-    if(pullauto == true) {
-              g_server->send(true, varlist);
-                if (cnsl.find("Skem") != -1) {
-                    if (cnsl.find("`$") != -1) {
-                        std::string nasmasma = cnsl.substr(cnsl.find("[W]_ `6<`") + 10, cnsl.length() - cnsl.find("[W]_ `6<`") - 1);
-                        nasmasma.erase(nasmasma.begin() + nasmasma.find("``>``"), nasmasma.end());
-                        g_server->send(false, "action|input\n|text|bapak kau " + nasmasma);
-                    }
-                } else if (cnsl.find("scam") != -1) {
-                    if (cnsl.find("`w") != -1) {
-                        std::string nasmasma = cnsl.substr(cnsl.find("[W]_ `6<`w") + 10, cnsl.length() - cnsl.find("[W]_ `6<`w") - 1);
-                        nasmasma.erase(nasmasma.begin() + nasmasma.find("``>``"), nasmasma.end());
-                        g_server->send(false, "action|input\n|text|/ban " + nasmasma);
-                    }
-                } else if (cnsl.find("dont") != -1) {
-                    if (cnsl.find("`w") != -1) {
-                        std::string nasmasma = cnsl.substr(cnsl.find("[W]_ `6<`w") + 10, cnsl.length() - cnsl.find("[W]_ `6<`w") - 1);
-                        nasmasma.erase(nasmasma.begin() + nasmasma.find("``>``"), nasmasma.end());
-                        g_server->send(false, "action|input\n|text|/ban " + nasmasma);
-                    }
-                } else if (cnsl.find("Scam") != -1) {
-                    if (cnsl.find("`w") != -1) {
-                        std::string nasmasma = cnsl.substr(cnsl.find("[W]_ `6<`w") + 10, cnsl.length() - cnsl.find("[W]_ `6<`w") - 1);
-                        nasmasma.erase(nasmasma.begin() + nasmasma.find("``>``"), nasmasma.end());
-                        g_server->send(false, "action|input\n|text|/ban " + nasmasma);
-                    }
-                } else if (cnsl.find("SCam") != -1) {
-                    if (cnsl.find("`w") != -1) {
-                        std::string nasmasma = cnsl.substr(cnsl.find("[W]_ `6<`w") + 10, cnsl.length() - cnsl.find("[W]_ `6<`w") - 1);
-                        nasmasma.erase(nasmasma.begin() + nasmasma.find("``>``"), nasmasma.end());
-                        g_server->send(false, "action|input\n|text|/ban " + nasmasma);
-                    }
-                } else if (cnsl.find("noob") != -1) {
-                    if (cnsl.find("`w") != -1) {
-                        std::string nasmasma = cnsl.substr(cnsl.find("[W]_ `6<`w") + 10, cnsl.length() - cnsl.find("[W]_ `6<`w") - 1);
-                        nasmasma.erase(nasmasma.begin() + nasmasma.find("``>``"), nasmasma.end());
-                        g_server->send(false, "action|input\n|text|/ban " + nasmasma);
-                    }
-                } else if (cnsl.find("lol") != -1) {
-                    if (cnsl.find("`w") != -1) {
-                        std::string nasmasma = cnsl.substr(cnsl.find("[W]_ `6<`w") + 10, cnsl.length() - cnsl.find("[W]_ `6<`w") - 1);
-                        nasmasma.erase(nasmasma.begin() + nasmasma.find("``>``"), nasmasma.end());
-                        g_server->send(false, "action|input\n|text|/ban " + nasmasma);
-                    }
-                } else if (cnsl.find("LOL") != -1) {
-                    if (cnsl.find("`w") != -1) {
-                        std::string nasmasma = cnsl.substr(cnsl.find("[W]_ `6<`w") + 10, cnsl.length() - cnsl.find("[W]_ `6<`w") - 1);
-                        nasmasma.erase(nasmasma.begin() + nasmasma.find("``>``"), nasmasma.end());
-                        g_server->send(false, "action|input\n|text|/ban " + nasmasma);
-                    }
-                }           
-        return true;
-}
+            g_server->send(true, varlist);
+            return true;
         } break;
 
+        case fnv32("OnConsoleMessage"): {
+            auto wry = varlist[1].get_string();
+            varlist[1] = "`2[`4melon`2]`o " + varlist[1].get_string();
+            g_server->send(true, varlist);
+
+            if (wry.find("wants to add you to a") != -1) {
+                string netidstring = toString(g_server->m_world.local.netid);
+
+                takingacc = true;
+                //gt::send_log("taking access");
+                //gt::send_log(netidstring);
+                g_server->send(false, "action|wrench\n|netid|" + netidstring);
+                Sleep(4000);
+                g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + netidstring + "|\nbuttonClicked|acceptlock");
+                Sleep(4000);
+                g_server->send(false, "action|dialog_return\ndialog_name|acceptaccess");
+                thread(forceacc).detach();
+            }
+
+            if (wry.find("gas") != -1 && gaspull && varlist[2].get_int32() != NULL && varlist[2].get_int32() != g_server->m_world.local.netid) {
+                PullNetID(toString(varlist[2].get_int32()));
+                if (automaticoff) {
+                    gaspull = false;
+                    gt::send_log("9Gas pull toggled off");
+                }
+            }
+            return true;
+        } break;
         case fnv32("OnDialogRequest"): {
             auto content = varlist[1].get_string();
-        if (wrench == true) {
-            if (content.find("add_button|report_player|`wReport Player``|noflags|0|0|") != -1) {
-                if (content.find("embed_data|netID") != -1) {
-                    return true; // block wrench dialog
-                }
-            }
-        }
-        if (fastdrop == true) {
-            std::string itemid = content.substr(content.find("embed_data|itemID|") + 18, content.length() - content.find("embed_data|itemID|") - 1);
-            std::string count = content.substr(content.find("count||") + 7, content.length() - content.find("count||") - 1);
-            if (content.find("embed_data|itemID|") != -1) {
-                if (content.find("Drop") != -1) {
-                    g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|" + itemid + "|\ncount|" + count);
-                    return true;
-                }
-            }
-        }
-        if (fasttrash == true) {
-            std::string itemid = content.substr(content.find("embed_data|itemID|") + 18, content.length() - content.find("embed_data|itemID|") - 1);
-            std::string count = content.substr(content.find("you have ") + 9, content.length() - content.find("you have ") - 1);
-            std::string delimiter = ")";
-            std::string token = count.substr(0, count.find(delimiter));
-            if (content.find("embed_data|itemID|") != -1) {
-                if (content.find("Trash") != -1) {
-                    g_server->send(false, "action|dialog_return\ndialog_name|trash_item\nitemID|" + itemid + "|\ncount|" + token);
-                    return true;
-                }
-            }
-        }
-       
 
+            if (content.find("set_default_color|`o") != -1) 
+            {
+                if (content.find("end_dialog|captcha_submit||Submit|") != -1) 
+                {
+                    gt::solve_captcha(content);
+                    return true;
+                }
+            }
+
+            if (wrench) {
+                if (content.find("add_button|report_player|`wReport Player``|noflags|0|0|") != -1) {
+                    if (content.find("embed_data|netID") != -1) {
+                        return true; // block wrench dialog
+                    }
+                }
+            }
+
+            if (fastdrop2) {
+                string itemid = content.substr(content.find("embed_data|itemID|") + 18, content.length() - content.find("embed_data|itemID|") - 1);
+                string count = content.substr(content.find("count||") + 7, content.length() - content.find("count||") - 1);
+                if (content.find("embed_data|itemID|") != -1) {
+                    if (content.find("Drop") != -1) {
+                        g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|" + itemid + "|\ncount|" + count);
+                        return true;
+                    }
+                }
+            }
+
+            if (fastdrop) {
+                string itemid = content.substr(content.find("embed_data|itemID|") + 18, content.length() - content.find("embed_data|itemID|") - 1);
+                string count = content.substr(content.find("count||") + 7, content.length() - content.find("count||") - 1);
+                if (content.find("embed_data|itemID|") != -1) {
+                    if (content.find("Drop") != -1) {
+                        if (fdcount == "0") {
+                            g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|" + itemid + "|\ncount|" + count);
+                            return true;
+                        }
+                        g_server->send(false, "action|dialog_return\ndialog_name|drop_item\nitemID|" + itemid + "|\ncount|" + fdcount);
+                        return true;
+                    }
+                }
+            }
+
+            if (takingunacc) {
+                if (content.find("Remove Your Access From World") != -1) {
+                    g_server->send(false, "action|dialog_return\ndialog_name|unaccess");
+                    return true;
+                }
+            }
+
+            if (takingacc) {
+                if (content.find("wants to add you to a")) {
+                    g_server->send(false, "action|dialog_return\ndialog_name|acceptaccess");
+                    return true;
+                }
+            }
+
+            if (fasttrash) {
+                string itemid = content.substr(content.find("embed_data|itemID|") + 18, content.length() - content.find("embed_data|itemID|") - 1);
+                string count = content.substr(content.find("you have ") + 9, content.length() - content.find("you have ") - 1);
+                string delimiter = ")";
+                string token = count.substr(0, count.find(delimiter));
+                if (content.find("embed_data|itemID|") != -1) {
+                    if (content.find("Trash") != -1) {
+                        g_server->send(false, "action|dialog_return\ndialog_name|trash_item\nitemID|" + itemid + "|\ncount|" + token);
+                        return true;
+                    }
+            }
+                    
             //hide unneeded ui when resolving
             //for the /uid command
-            if (gt::resolving_uid2 && (content.find("friend_all|Show offline") != -1 || content.find("Social Portal") != -1) ||
-                content.find("Are you sure you wish to stop ignoring") != -1) {
-                return true;
-            } else if (gt::resolving_uid2 && content.find("Ok, you will now be able to see chat") != -1) {
-                gt::resolving_uid2 = false;
-                return true;
+
             } else if (gt::resolving_uid2 && content.find("`4Stop ignoring") != -1) {
                 int pos = content.rfind("|`4Stop ignoring");
                 auto ignore_substring = content.substr(0, pos);
@@ -693,38 +958,31 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
                 for (size_t i = 0; i < players.size(); i++) {
                     auto& player = players[i];
                     if (player.netid == netid) {
-                        players.erase(std::remove(players.begin(), players.end(), player), players.end());
+                        players.erase(remove(players.begin(), players.end(), player), players.end());
                         break;
                     }
                 }
             }
         } break;
         case fnv32("OnSpawn"): {
-            std::string meme = varlist.get(1).get_string();
+            string meme = varlist.get(1).get_string();
             rtvar var = rtvar::parse(meme);
             auto name = var.find("name");
             auto netid = var.find("netID");
             auto onlineid = var.find("onlineID");
-
             if (name && netid && onlineid) {
                 player ply{};
-
-                if (var.find("invis")->m_value != "1") {
-                    ply.name = name->m_value;
-                    ply.country = var.get("country");
-                    name->m_values[0] += " `4[" + netid->m_value + "]``";
-                    auto pos = var.find("posXY");
-                    if (pos && pos->m_values.size() >= 2) {
-                        auto x = atoi(pos->m_values[0].c_str());
-                        auto y = atoi(pos->m_values[1].c_str());
-                        ply.pos = vector2_t{ float(x), float(y) };
-                    }
-                } else {
-                    ply.mod = true;
-                    ply.invis = true;
+                ply.mod = false;
+                ply.invis = false;
+                ply.name = name->m_value;
+                ply.country = var.get("country");
+                name->m_values[0] += " `4[" + netid->m_value + "]``";
+                auto pos = var.find("posXY");
+                if (pos && pos->m_values.size() >= 2) {
+                    auto x = atoi(pos->m_values[0].c_str());
+                    auto y = atoi(pos->m_values[1].c_str());
+                    ply.pos = vector2_t{ float(x), float(y) };
                 }
-                if (var.get("mstate") == "1" || var.get("smstate") == "1")
-                    ply.mod = true;
                 ply.userid = var.get_int("userID");
                 ply.netid = var.get_int("netID");
                 if (meme.find("type|local") != -1) {
@@ -740,19 +998,18 @@ bool events::in::variantlist(gameupdatepacket_t* packet) {
                 g_server->send(true, varlist, -1, -1);
                 return true;
             }
-
-            
         } break;
+        case fnv32("OnNameChanged"): thread(itsmod,packet->m_player_flags, varlist[1].get_string()).detach(); return false;
     }
     return false;
 }
 
-bool events::in::generictext(std::string packet) {
+bool events::in::generictext(string packet) {
     PRINTC("Generic text: %s\n", packet.c_str());
     return false;
 }
 
-bool events::in::gamemessage(std::string packet) {
+bool events::in::gamemessage(string packet) {
     PRINTC("Game message: %s\n", packet.c_str());
 
     if (gt::resolving_uid2) {
@@ -772,9 +1029,18 @@ bool events::in::gamemessage(std::string packet) {
 
 bool events::in::sendmapdata(gameupdatepacket_t* packet) {
     g_server->m_world = {};
+
+    std::ofstream sethost("D:\\Code\\C++\\kusiproxy\\x64\\Release\\text.txt");
+
+    if (sethost.is_open()) {
+        sethost << packet;
+        sethost.close();
+    }
+
     auto extended = utils::get_extended(packet);
     extended += 4;
     auto data = extended + 6;
+
     auto name_length = *(short*)data;
 
     char* name = new char[name_length + 1];
@@ -782,7 +1048,7 @@ bool events::in::sendmapdata(gameupdatepacket_t* packet) {
     char none = '\0';
     memcpy(name + name_length, &none, 1);
 
-    g_server->m_world.name = std::string(name);
+    g_server->m_world.name = string(name);
     g_server->m_world.connected = true;
     delete[] name;
     PRINTC("world name is %s\n", g_server->m_world.name.c_str());
@@ -799,14 +1065,13 @@ bool events::in::state(gameupdatepacket_t* packet) {
     for (auto& player : players) {
         if (player.netid == packet->m_player_flags) {
             player.pos = vector2_t{ packet->m_vec_x, packet->m_vec_y };
-            PRINTC("player %s position is %.0f %.0f\n", player.name.c_str(), player.pos.m_x, player.pos.m_y);
             break;
         }
     }
     return false;
 }
 
-bool events::in::tracking(std::string packet) {
+bool events::in::tracking(string packet) {
     PRINTC("Tracking packet: %s\n", packet.c_str());
     return true;
 }
