@@ -65,16 +65,16 @@ bool events::out::generictext(std::string packet) {
                 g_server->send(false, packet);
                 std::string sr = packet.substr(packet.find("netid|") + 6, packet.length() - packet.find("netid|") - 1);
                 std::string motion = sr.substr(0, sr.find("|"));
-                if (mode.find("pull") != -1) {
+                if (mode.find("pl") != -1) {
                     g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|pull");
                 }
-                if (mode.find("kick") != -1) {
+                if (mode.find("kck") != -1) {
                     g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|kick");
                 }
                 if (mode.find("ban") != -1) {
                     g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|worldban");
                 }
-                if (mode.find("trade") != -1) {
+                if (mode.find("trd") != -1) {
                     g_server->send(false, "action|dialog_return\ndialog_name|popup\nnetID|" + motion + "|\nnetID|" + motion + "|\nbuttonClicked|trade");
                 }
                 if (mode.find("add") != -1) {
@@ -194,12 +194,12 @@ bool events::out::generictext(std::string packet) {
          }
 
         
-        else if (find_command(chat, "wrenchset ")) {
+        else if (find_command(chat, "wset ")) {
             mode = chat.substr(10);
             gt::send_log("`#Wrench mode set to " + mode);
             return true;        
         }
-        else if (find_command(chat, "wrenchmode")) {
+        else if (find_command(chat, "wm")) {
             wrench = !wrench;
             if (wrench)
                 gt::send_log("`#Wrench mode is on.");
@@ -337,30 +337,7 @@ bool events::out::generictext(std::string packet) {
             return true;
 
 
-}else if (find_command(chat, "pinfo")) {
-                   std::string paket;
-            paket =
-                "\nadd_label_with_icon|big|Proxy information|left|20|"
-               "\nadd_image_button|banner|interface/large/special_event.rttex|bannerlayout|||"
-                "\nadd_spacer|small"
-                "\nadd_textbox|`9This Proxy Made by Ama6nen and Re-Edit By FakeModz#1192|left|2480|"
-                "\nadd_textbox|`9Command List for command list please do /phelp|left|2480|"
-                "\nadd_textbox|`9Thanks to :|left|2480|"
-                "\nadd_textbox|`9Gucktube YT|left|2480|"
-                "\nadd_textbox|`9Ama6nen|left|2480|"
-                "\nadd_textbox|`9Genta 7740|left|2480|"
-                "\nadd_textbox|`9BotHax YT|left|2480|"
-                "\nadd_textbox|`9SrMotion|left|2480|"
-                "\nadd_textbox|`9If you Want Re-Edit this proxy please|left|2480|"
-                "\nadd_textbox|`9Dont Edit/Delete The Credits!!!|left|2480|"
-                "\nadd_textbox|`9or you will dieee !!!!!|left|2480|"
-                "\nadd_quick_exit|"
-                "\nend_dialog|end|Cancel|Okay|";
-            variantlist_t liste{ "OnDialogRequest" };
-            liste[1] = paket;
-            g_server->send(true, liste);
-            return true;
-        
+
         } else if (find_command(chat, "proxy")) {
            // gt::send_log(
             //    "`2/tp [name] (teleports to a player in the world), /ghost (toggles ghost, you wont move for others when its enabled), /uid "
